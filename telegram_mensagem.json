@@ -1,0 +1,42 @@
+{
+  "name": "telegram_mensagem",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "80b6d019-9cba-440e-9f95-33dfe7a68f82",
+      "name": "Telegram Trigger",
+      "webhookId": "809eef2b-a8d4-4d47-8127-235797c629fd",
+      "credentials": {
+        "telegramApi": {
+          "id": "DyrhKrn5zxvb4jPz",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "08f44ec5-5adc-4202-ae15-63066b25a263",
+  "meta": {
+    "instanceId": "a11dca2481091794aff933e363963a7f73f93e7797baa1e2c446e8e94974b9c9"
+  },
+  "id": "MqCRh0wAbeCJzZe_bqE_c",
+  "tags": []
+}

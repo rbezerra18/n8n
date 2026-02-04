@@ -1,0 +1,301 @@
+{
+  "name": "resposta_email",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9aa63240-7272-4974-a417-7a7cb00ca8d7",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kPrFYv9OqpNKEM65",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "60c11636-0aef-4854-9e7c-f92226cc98c2",
+              "leftValue": "={{ $json.from.value[0].address }}",
+              "rightValue": "@crvimagem.com.br",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ec1e0745-c439-45ca-a8a5-c34cc9b9d16b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Gmail Trigger').item.json.text }}",
+        "options": {
+          "systemMessage": "Você é um agente comercial especializado em venda de cursos online. O seu objetivo é tirar dúvidas dos Programas Online da Hashtag Treinamentos. Seguem informações abaixo:\n \n1. QUE SERVIÇO VOCÊS SÃO ESPECIALIZADOS?\nAqui na Hashtag você encontra  treinamentos online  voltados para o mercado de trabalho.\nOferecemos cursos das principais ferramentas utilizadas profissionalmente, que são:\nExcel\nPower BI\nPython\nInteligência Artificial\nJavaScript\nHTML & CSS supor\nSQL\nPower Automate\nVBA\nPowerPoint\nCiência de Dados\nInclusive, temos mais de 170.000 alunos na Hashtag\nMas me conta, qual desses treinamentos desperta mais seu interesse?\n2. QUAIS CURSOS DE PROGRAMAÇÃO A HASHTAG POSSUI?\nOpa, aqui na Hashtag temos cursos das linguagens de programação mais importantes e usadas no mercado de trabalho que são:\nPython\nJavaScript\nHTML & CSS\nSQL\nFull Stack\nCiência de Dados\nMas me conta, qual desses treinamentos desperta mais seu interesse?\n3. COMO SEI QUE ESSA É UMA EMPRESA CONFIÁVEL?\nOpa, vou compartilhar alguns dados com você para reforçar o quanto somos uma empresa confiável e comprometida, tá bem?\nTemos mais de 170 mil alunos treinados em todo o Brasil.\nNo nosso canal no YouTube, temos mais de 1,5 milhão de inscritos. É só procurar por “Hashtag Treinamentos”. Por lá você verá diversas avaliações positivas, tanto dos nossos seguidores quanto dos nossos alunos.\nPossuímos selo de confiança do Reclame Aqui. Com uma reputação avaliada como ótima pelos consumidores e com uma nota de 9.1.\nTodos os nossos programas são extremamente didáticos, com índice de satisfação superior a 85% e levam qualquer um do básico até o nível Impressionador, que está além do avançado\nAlém dos cursos próprios, a Hashtag já realizou treinamentos in-company em grandes empresas como LinkedIn, L’Oreal, Coca-Cola, AirFrance, Rappi, Nestlé, Grupo Soma, Globo, Repsol, Electrolux e centenas de outras empresas.\nEntão, pode ter certeza de que está falando com uma empresa de confiança e referência no mercado!\n4. TEM AULA OU CURSO PRESENCIAL?\nNo momento nossos cursos são com aulas gravadas e possuem um acesso de 12 meses.\nEntão durante todo esse período, você poderia assistir e reassistir as aulas gravadas quantas vezes e quando quiser no seu próprio tempo. Sem se preocupar com o horário.\nE para melhorar mais ainda, no pacote dos cursos está incluso suporte a dúvidas da nossa equipe de experts. Então de segunda à sexta você pode tirar qualquer dúvida sobre a ferramenta do curso e em 24 horas alguém da nossa equipe vai te responder de forma individual para te ajudar.\nAlém disso, aqui na Hashtag trabalhamos com uma garantia incondicional de 7 dias. Isso significa que durante os 7 primeiros dias, você poderia testar ilimitadamente nosso curso e verificar se consegue se adaptar. Caso ache que o investimento não foi prov eitoso, você pode requisitar o reembolso integral do valor pago. A ideia é deixar você sem nenhum risco sobre a decisão que está tomando.\nMas me conta, por acaso você estaria buscando algum curso específico?\n5. NÃO TEMOS PREVISÃO PARA UMA TURMA PRESENCIAL\nNo momento não temos previsão para uma turma presencial. Por enquanto o nosso foco está sendo 100% nos nossos cursos online\n6. QUAIS AS REDES SOCIAIS?\nVocê pode nos acompanhar nas seguintes páginas de Instagram\nHashtag Treinamentos: https://www.instagram.com/hashtagtreinamentos/\nHashtag Programação: https://www.instagram.com/hashtagprogramacao/\nHashtag Inglês: https://www.instagram.com/hashtag.ingles/\n7. QUAIS SÃO OS EVENTOS GRATUITOS?\nOpaaa, além dos nossos vídeos gratuitos no YouTube, também temos eventos 100% online e gratuitos\nEventos com 4 aulas ao vivo (com 2h de duração cada aula) e conteúdos que vão te ajudar a impressionador e se tornar uma referência no mercado de trabalho: Jornada Python,Jornada Inteligência Artificial e Intensivão de Power BI.\nEventos com 1 aula online (com 1h30min de duração) com conteúdo direto ao ponto para te ajudar a se destacar: Masterclass Análise de Dados, Masterclass Inteligência Artificial e Masterclass Ciência de Dados.\nLives ao vivo de apresentações dos nossos cursos impressionadores: Live Comunidade\nImpressionadora, Live SQL Impressionador e Live Full Stack Impressionador.\nCOMUNIDADE IMPRESSIONADORA\n \n8. O QUE É A COMUNIDADE IMPRESSIONADORA?\nPARTE 1:\nA Comunidade é o nosso pacote especial de cursos completos e impressionadores. Você vai encontrar tudo o que você precisa saber para se destacar no Mercado de Trabalho, usando as ferramentas e linguagens de programação mais importantes\nExcel:\nPower BI\nInteligência Artificial\nVBA\nPowerPoint\nPython\nSQL\nJavaScript\nHTML & CSS\nPower Automate\nPARTE 2:\nVocê terá 12 meses de acesso irrestrito a todos estes cursos  - e a vários outros bônus – com possibilidade de renovação no fim desse período\nMas para melhorar mais ainda, você terá acesso não só aos cursos completos, mas também ao material didático complementar de cada um deles, certificado de conclusão para cada curso finalizado e ao suporte de dúvidas com nossa equipe de especialistas e com a  nossa IA, o Hashbot.\nLiteralmente tudo o que você precisa para virar uma referência em qualquer empresa\nPARTE 3:\nVou deixar aqui no nosso chat o link da página com todas as informações sobre a Comunidade Impressionadora\nhttps://blp.hashtagtreinamentos.com/comunidade-impressionadora/pg-inscricao-comunidade-impressionadora?src=lescom-jv\nSeria bacana você dar uma olhadinha até pra entender melhor como funciona o pacote e qual é a proposta do nosso treinamento. E, se você quiser, pode fazer sua inscrição por esse link mesmo!\nCaso você tenha qualquer dúvida com as informações do site, corre aqui que eu te explico tudo que precisar, tá bem?\n9. QUAIS SÃO TODOS OS CURSOS COMPLETOS DA COMUNIDADE?\nCursos impressionadores: Excel, Power BI, Python, Inteligência Artificial, Análise de Dados, HTML & CSS, JavaScript, SQL, Power Automate, Full Stack, Front End, VBA e PowerPoint;\n10. PODE ME ENVIAR AS EMENTAS DOS CURSOS COMPLETOS DA COMUNIDADE?\nPower BI : https://tinyurl.com/ementa-powerbi\nExcel : https://tinyurl.com/ementa-excel\nPython: https://tinyurl.com/ementa-python\nInteligência Artificial : https://tinyurl.com/ementa-ia\nHTML & CSS : https://tinyurl.com/ementa-htmlcss\nJavaScript : https://tinyurl.com/ementa-javascript\nSQL: https://tinyurl.com/ementa-sql\nPower Automate : https://tinyurl.com/ementa-powerautomate\nVBA:  https://tinyurl.com/ementa-vba\nApresentações/Power Point : https://tinyurl.com/ementa-powerpoint\n11. PODE ME ENVIAR AS EMENTAS DOS BÔNUS?\nPower Apps: https://tinyurl.com/ementa-powerapps\nAnálise de Dados: https://tinyurl.com/ementa-analisededados\nFull Stack: https://tinyurl.com/ementa-fullstack\nAWS: https://tinyurl.com/ementa-aws-impressionador\n12. MAIS DETALHES SOBRE OS CURSOS COMPLETOS DA COMUNIDADE:\nPARTE 1:\nVou resumir para você cada um dos cursos completos da Comunidade Impressionadora:\nO Power BI Impressionador é o nosso curso completo de Power BI, com mais de 112h de conteúdo e mais de 400 aulas, desde o nível básico, te ensinando a parte de importação de dados e ETL, até o nível avançado, com criação de dashboards, Power BI Online e DA X avançado.\nO Excel Impressionador é o nosso curso completo de Excel, que possui 110h de conteúdo e mais de 500 aulas, do básico ao avançado. Nele, você aprenderá desde conceitos introdutórios até a criação de planilhas e dashboards com recursos avançados.\nO Python Impressionador é o nosso curso completo de Python, com mais de 150h de conteúdo e maisde 600 aulas, te ensinando desde o básico do básico em Python, até a parte de projetos mais avançados de automação web, análise de dados, desenvolvimento de sit es e aplicativos. Não só isso, como você vai sair do curso com um portfólio de projetos completo!\nPARTE 2:\nO Inteligência Artificial Impressionador possui mais de 40h de conteúdo e mais de 170 aulas, para te ajudar a desvendar o mundo da Inteligência Artificial. No curso, apresentamos as principais IAs e aplicações reais do mercado de trabalho. Não só isso, com o também aprofundamos configurações avançadas em IAs tanto gratuitas, quanto pagas.\nO JavaScript Impressionador, é o nosso curso completo de JavaScript, atualmente com mais de 500 aulas e 117h de conteúdo. Você vai aprender não só os fundamentos básicos, intermediários e avançados de JavaScript, como também vai aprender sobre Back -end, Fr ont-end, Full Stack, a integrar o JavaScript com bancos de dados, além de Node JS,  React JS e muito mais.\nO HTML & CSS é o nosso curso completo de HTML & CSS, atualmente com mais de 295 aulas e 72h de conteúdo. Você vai aprender não só os fundamentos básicos, intermediários e avançados de HTML e CSS, como também vai aprender a integrar com os principais frameworks.\nPARTE 3:\nO Análise  de Dados Impressionador possui mais de 180h de conteúdo e mais de 900 aulas. Vamos te ensinar tudo o que você precisa para dominar as habilidades de Análise de Dados com Excel, PowerBI, SQL e Python. O programa é realmente completo e você vai aprender a resolver desafios reais de Análise de Dados em diferentes áreas. Por isso, vamos te mostrar os 3 pilares da Análise de Dados:\nFerramenta de Análises e Visualização de Dados + Programação + Negócios.\nNo Power Automate Impressionador você vai aprender a usar todas as funcionalidades do PowerAutomate e integrações com as ferramentas mais importantes do mercado. Não só isso, como também vamos construir projetos práticos, justamente com a realidade do dia  a dia das empresas.\nAtualmente, o curso possui mais de 100 aulas, totalizando 14 horas de conteúdo. Mas isso é só o começo! A cada mês, vamos liberar novas aulas.\nO SQL Impressionador, o nosso curso completo de SQL, com 89h de conteúdo e mais de 700 aulas passo a passo, te ensinando a utilizar o SQL nos principais sistemas de bancos de dados (SQL Server,MySQL, PostgreSQL e Oracle) além de projetos de Integração do SQL com o Power BI e Excel.\nPARTE 4:\nO VBA Impressionador é o nosso curso completo de VBA, e conta com mais de 80h de conteúdo e mais de 400 aulas. O VBA é a linguagem de programação para automatização de planilhas, muito utilizada para melhorar ainda mais a utilização das suas planilhas em Excel.\nO PowerPoint Impressionador é o nosso curso completo de PowerPoint, com 27h de conteúdo e mais de 100 aulas bem passo a passo, que vão te ensinar não só a utilizar\na ferramenta, como também disponibilizar técnicas para melhorar suas apresentações.\n13. PARA QUE SERVE CADA FERRAMENTA DOS CURSOS COMPLETOS?\nPARTE 1:\nO Power BI é uma ferramenta da Microsoft para Business Intelligence. Muito utilizada para apresentação e análise de dados. Seu principal objetivo é a criação de dashboards e apresentações gráficas para mostrar resultados de um negócio. O Power BI é uma fer ramenta que tem diversos recursos e ferramentas avançadas para criação de análises e cálculos relacionados à análise dos dados.\nO Excel é de longe a ferramenta mais utilizada pelas empresas. É muito difícil você encontrar uma empresa que não utilize uma planilha em Excel para criação, controle e gerenciamento de dados.\nO Python é a linguagem de programação que mais cresce no mundo. O objetivo do Python é criar códigos que tornam automáticas as tarefas de uma empresa. Ou seja, com uma série de comandos é possível executar qualquer tarefa, desde enviar um e -mail de forma a utomática até criar aplicativos para uma determinada atividade. Além disso, com o Python também é possível desenvolver e criar diversos sites e sistemas.\nPARTE 2:\nO HTML e CSS são as linguagens de programação utilizadas para criar e estilizar sites na WEB. Todo e qualquer site existente hoje na Internet, utiliza essas duas linguagens em seus códigos. O HTML atua na parte da construção da estrutura do site, já o CSS atua na estilização das páginas. Então, enquanto o HTML monta o esqueleto da página, o CSS deixa a página bonita e visual. O HTML e o CSS atuam em conjunto para criar páginas bonitas e bem estruturadas.\nO JavaScript é a linguagem de programação que é usada por 98,3% dos sites e te permite ser umdesenvolvedor full stack, aprendendo: Desenvolvimento Front -end (o que o usuário vê), desenvolvimento Backend (a inteligência por trás dos sites e aplicativos sem  o usuário ver), banco de Dados (a parte de armazenamento de informações).\nO SQL é a linguagem de programação mais importante para trabalhar com grande volume de informações – os chamados Bancos de Dados, já que com o SQL, você consegue criar os Bancos de Dados, editar, extrair e analisar as informações desses Bancos de Dados das  empresas.\nPARTE 3:\nO Power Automate é uma ferramenta da Microsoft que permite automatizar tarefas e processos repetitivos sem a necessidade de programação. Ele se integra facilmente com uma ampla gama de serviços e aplicativos, facilitando a transferência e sincronização de dados. Com o Power Automate, você pode aumentar a eficiência e a produtividade, reduzir erros humanos e criar fluxos de trabalho personalizados para atender às necessidades específicas do seu negócio.\nO VBA é a linguagem de programação por trás dos programas do Microsoft Office: Word, Excel, PowerPoint e Outlook. Com essa linguagem, é possível criar códigos para automatizar tarefas realizadas em qualquer um desses programas, seja para automatizar a criação de documentos em word, envio de e -mails, automatizar apresentações no PowerPoint ou até mesmo fazer com que esses programas comuniquem-se entre si.\nJá o PowerPoint, é um programa para criação de apresentações. Ainda é o programa para criação de apresentações mais popular atualmente.\n14. AS FERRAMENTAS DOS CURSOS COMPLETOS SÃO GRATUITAS OU PAGAS?\nOpaaa, você pode ficar tranquilo que a grande maioria das ferramentas dos cursos da Comunidade Impressionadora são 100% gratuitas! Como o Power BI, Python, Power Automate, SQL, Power Apps, HTML & CSS e JavaScript.\nAs únicas ferramentas que não são gratuitas são o Excel e o PowePoint, onde seria necessário a assinatura do Pacote Office.\nMas no próprio site da Microsoft você encontra planos bem legais\nhttps://www.microsoft.com/pt-br/microsoft-365#Plans:\n15. PODE ME RESUMIR COMO SÃO TODOS OS CURSOS DA COMUNIDADE?\nAhh que maneiro seu interesse pelos nossos cursos! Vou te explicar um pouquinho mais sobre eles:\nVão desde o absoluto zero  até o nível avançado. Você não precisa ter nenhum conhecimento prévio para fazer as aulas. Tudo o que você precisa aprender você encontrará nos nossos cursos completos;\nAlém das aulas, você também terá acesso ao material didático completo, com muitos exercícios de cada módulo e certificado de conclusão.\nSuporte a dúvidas. Dentro da própria plataforma das aulas, você poderá enviar todas as suas dúvidas referentes as ferramentas e anexar vídeos, arquivos, planilhas e tabelas. Nossa equipe de experts terá o maior prazer em te ajudar.\n \nNas respostas, sempre inclua o link correspondente ao curso perguntado para que a pessoa faça a inscrição.\nAlém disso, sempre responda formatando o texto em HTML válido, usando:\n- <br> para quebras de linha\n- <b> para negrito\n- <ul><li>...</li></ul> para listas\ne quaisquer outras formatações necessárias"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        416,
+        -96
+      ],
+      "id": "b5455cb0-8744-4919-83e4-cef64ca2374f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        416,
+        144
+      ],
+      "id": "d95dfa4a-aee8-46c4-9e17-e660b4c6f221",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "wN3GspTx0Xrmvpkj",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Gmail Trigger').item.json.threadId }}",
+        "contextWindowLength": 25
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        512,
+        288
+      ],
+      "id": "c8b12dd4-e0d9-4d17-bf32-4242d3ef51c8",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "message": "={{ $json.output }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        768,
+        -96
+      ],
+      "id": "6bc8fc86-95fb-4124-83e3-063ddfae8f23",
+      "name": "Reply to a message",
+      "webhookId": "56d29a5b-0428-45d7-877d-5b678cc7d0ee",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kPrFYv9OqpNKEM65",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Gmail Trigger": [
+      {
+        "json": {
+          "id": "19c260cf742cb520",
+          "threadId": "19c260cf742cb520",
+          "labelIds": [
+            "IMPORTANT",
+            "CATEGORY_PERSONAL",
+            "INBOX"
+          ],
+          "sizeEstimate": 13549,
+          "headers": {
+            "delivered-to": "Delivered-To: rbezerra18@gmail.com",
+            "received": "Received: from CPWPR80MB8993.lamprd80.prod.outlook.com\r\n ([fe80::9315:6ad1:3809:2a9c]) by CPWPR80MB8993.lamprd80.prod.outlook.com\r\n ([fe80::9315:6ad1:3809:2a9c%2]) with mapi id 15.20.9587.010; Wed, 4 Feb 2026\r\n 00:28:27 +0000",
+            "x-received": "X-Received: by 2002:a05:690c:4444:b0:78d:b1e9:85ce with SMTP id 00721157ae682-794fe7ece68mr12285617b3.59.1770164909799;\r\n        Tue, 03 Feb 2026 16:28:29 -0800 (PST)",
+            "arc-seal": "ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;\r\n b=lU0deUFYtxp6KfcMmKTdBpxLnj5udewg8hH0rqCMPtPrb91FqeYuFG6o4+T64khU2WZZMV5JfXMRyHGtX9rhFmNESmqkjWLRF2SiCkhGCwjr5NnoqnP+xOImf/73Hyna4p7EvvL9KnJ0nnFkVkJD8RzfcwRR1CRS0l+G5f2iZty1JXJmaUgFUQqVUnOwxnNBkwrtf9S/sRKopq5wz79lkgiRzY1fSlI9jAq9ytVbnd4IKd/oMg2HxxqtiR+ccT5rI3Wu0dLjFY9y5yU2T0zklSEEDXjiAbY2NA1SltBJPquGDRsj4C3n/gNd3IRKCKwc98IigSEuexa/ISdP2u7niA==",
+            "arc-message-signature": "ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;\r\n s=arcselector10001;\r\n h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;\r\n bh=KFyvsndkLIkDwFQxakuDZO6U/eSHrCMd33oKU1APlxo=;\r\n b=J8KJquLkwObCj5gMWdn2w9ddVRZDdlEKW4x99gVb318LCkV2UoQyDpBWNP20YaXw+92TXg6aWJloMgPxnQ3tzQjW8eXSNcF2DFASP+FIsG1XwUm7ac5b4Si23SjXNVj9hvxHo10FlIAlUbQuc9eMtTMj0eaWm2AweKYkx+KE32YyqoTOxnejspD6wHksFvFwv+ecxwF8qni3GELYwKxF0VcjZz3tpKkPvf6JNUxF8smxwvmr2rYzuLyNolt79JtPFaajVhIz1DW94sFUGMTjI5vtiGcNH36K9lsYSvvcOhqiVFgbevt3XGuxOg/w3ajL940SyfhJQrnF+q60vnO1tw==",
+            "arc-authentication-results": "ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;\r\n dkim=none; arc=none",
+            "return-path": "Return-Path: <rbezerra18@hotmail.com>",
+            "received-spf": "Received-SPF: pass (google.com: domain of rbezerra18@hotmail.com designates 2a01:111:f403:d116::3 as permitted sender) client-ip=2a01:111:f403:d116::3;",
+            "authentication-results": "Authentication-Results: mx.google.com;\r\n       dkim=pass header.i=@hotmail.com header.s=selector1 header.b=VhJQJ1Hj;\r\n       arc=pass (i=1);\r\n       spf=pass (google.com: domain of rbezerra18@hotmail.com designates 2a01:111:f403:d116::3 as permitted sender) smtp.mailfrom=rbezerra18@hotmail.com;\r\n       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=hotmail.com",
+            "dkim-signature": "DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;\r\n s=selector1;\r\n h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;\r\n bh=KFyvsndkLIkDwFQxakuDZO6U/eSHrCMd33oKU1APlxo=;\r\n b=VhJQJ1Hjf22yoKoG5BmmaDcdFm7Wr/QDaaqfw42hvslP5PZ0nkE7NjtXV3uJJ3Vf602smQUvhsVxMtL37V/V+ppHp+HrmKwXU9T85G0fpwT5SXeE0GjYIArjhZpZGIYHa77UoXoUPiUDQHZDCZ+v/r0w0tCueR0Axfob18TSNhAXhQ0sQAxuBggPBHp8FsLUnnPVYelERQGsApxIbTNkAuL/zWzipbPQiqj25/Wt+hCmt08xBSB/gJFPJQfWzXdqQGG4ufSWTaAh0UxGVFODet7Hoq6C2kxJaIl/RlSZi3mh37OYrH4UfK24BSc2j5w5st6lCVQ+xzAmEmDijmE0Pg==",
+            "from": "From: =?iso-8859-1?Q?Roberto_J=FAnior?= <rbezerra18@hotmail.com>",
+            "to": "To: Roberto Bezerra <rbezerra18@gmail.com>",
+            "subject": "Subject: =?iso-8859-1?Q?D=FAvida_curso_n8n?=",
+            "thread-topic": "Thread-Topic: =?iso-8859-1?Q?D=FAvida_curso_n8n?=",
+            "thread-index": "Thread-Index: AQHclW0DdPG4K3hgfEqnC0VrCNDitg==",
+            "date": "Date: Wed, 4 Feb 2026 00:28:26 +0000",
+            "message-id": "Message-ID:\r\n <CPWPR80MB8993F177992F73B2A04F2ACCCD98A@CPWPR80MB8993.lamprd80.prod.outlook.com>",
+            "accept-language": "Accept-Language: pt-BR, en-US",
+            "content-language": "Content-Language: pt-BR",
+            "x-ms-has-attach": "X-MS-Has-Attach:",
+            "x-ms-tnef-correlator": "X-MS-TNEF-Correlator:",
+            "msip_labels": "msip_labels:",
+            "x-ms-exchange-messagesentrepresentingtype": "x-ms-exchange-messagesentrepresentingtype: 1",
+            "x-ms-publictraffictype": "x-ms-publictraffictype: Email",
+            "x-ms-traffictypediagnostic": "x-ms-traffictypediagnostic: CPWPR80MB8993:EE_|RO2PR80MB7578:EE_",
+            "x-ms-office365-filtering-correlation-id": "x-ms-office365-filtering-correlation-id: bdc9e131-2047-48e4-f633-08de63845058",
+            "x-ms-exchange-slblob-mailprops": "x-ms-exchange-slblob-mailprops:\r\n hnD4Fgoc1bMtdVK8JDYACURs0WiPprZ/tQfnQ0N822IUbTXwDcVgzw5zibeGBV324OhzP3j82boB0LSBpkXhFdflJJtZznPv6g5SPY5ivJgjM+m61elXgRhA5mLOOEILQQAD/PcfWkj0I2TfPE+lb4qh1AjXyKxQGM2dhkw70wLXSW/8BtgIag70TgGZk9cMoHQoN1Rfb/YsKA+PnnS+aLQQq7CoIOqIFf9ejuw16x8qU+GNi6ii9VFQycgOdBkz5kqLNKhFcyIYid/b/CE2akMnDKY2XBtWDJARRKP8q3MHvIlWB7gMK+VHyh5OZq1s0yLmbIlQj8l0KjVsp/2kqkigbFh/0kE19jRboAuZVFMHgY01rq2j3ExrkKAKO/GM/mOFxnGsCeDpAAtKqcxN4Bxg1sd+Di+X/q4CYmT1mYKy40nQXb/Bw0/lVS08hzLZklwo9z89CCmtocEpCvQpKi3Rl7ka3fqAmmY2zT68LEyMpUgQrZGNgLzrtQVBSCeSvAGnylt2g2OlkfcCxmXWlx5LrsqodY111yhCJtz2HrhEuTGQjfSaAWrQyIvyV9GamSLDj6JJsuxXcsF1DIh7vJbRmaHRWDsv6ABW3L7DOHrhRQDpuNzP05nOTMyh5BrO",
+            "x-microsoft-antispam": "x-microsoft-antispam:\r\n BCL:0;ARA:14566002|31061999003|7071999006|461199028|15030799006|15080799012|20031999003|19110799012|39105399006|8060799015|8062599012|55001999003|440099028|3412199025|40105399003|102099032;",
+            "x-microsoft-antispam-message-info": "x-microsoft-antispam-message-info:\r\n =?iso-8859-1?Q?9lSXDqmdDU/LD2vZeJAgVa0V2JisUgRnwJppNMxpKfFQ3BXCfe57kEWd7V?=\r\n =?iso-8859-1?Q?dHC6T2VvD2mJhZNmJ+zG5YOPt7CwwHZlMKwDiYquf9ZlYgRQJc6Nqhw6Cf?=\r\n =?iso-8859-1?Q?XHXepGZiiX1PRzaflbq6ckgmTADon7v8laAlDVDEsXSC+2AObY3S1ILa7q?=\r\n =?iso-8859-1?Q?QqF5ss6U8ff4WwRPzyG52EYpkKZ8aggK1NPU3a6Qgk6dZs/1FhujNU9PiH?=\r\n =?iso-8859-1?Q?MtKLoWgXKU/RwriwzAGzTi5vDANBapvt8yU5hk7zzeURA5iQIgQkXdkW70?=\r\n =?iso-8859-1?Q?aJwoPGlluULb4J0XfvU4gKQgHvwg6SzB9oOkCnQ69PWwXZgMNoPJBjUtAU?=\r\n =?iso-8859-1?Q?xPt3HBOIjfCcz/fJoQSh9HCg8EPBDwrlBIFEJx9Hvx2kYVoaVelS7RkgfA?=\r\n =?iso-8859-1?Q?z/GwejV6poClKGtdE9xjH17vq6YW6EWQXLpcM5yoN9wgBbFOaIwd5yJrP6?=\r\n =?iso-8859-1?Q?CxSlMVvg0zW1aNqyw4l8LIxU2CguolUTOWJY4Cv7e+V9OYbdrU3QNiD4RH?=\r\n =?iso-8859-1?Q?z6vwXkDbQ7G3sB1tt6PRR4+G7pOEaBT0++o66DTiQ9z2CocFgFt84pBg4b?=\r\n =?iso-8859-1?Q?EtDH6/O9FSzVYGo/bHrYS1kSYcNOyl2WLKKghBy8TFxyHpZeFK9rqoKzZe?=\r\n =?iso-8859-1?Q?jt/sFop3lXxUmImyvpKzR5xRwx3zrGtmx1v5R8n7ejQkcu5bIvYgK8azrq?=\r\n =?iso-8859-1?Q?+ITB70GaLrUyM/ScFXAe8MrbNch6FQEvXaD4nuuf8VxlkIJaHjZJYJfbqX?=\r\n =?iso-8859-1?Q?GfRHDiUBYAZWvMltCEbj6OWRI6N/jI5WzBoedWInhpMwOucvFCwGhPSu8j?=\r\n =?iso-8859-1?Q?shyWV1YFsZOMZfNdsLJstkTZsGTbZVZjS1tgsGysRky7zYlCy9ZsuRZZ9M?=\r\n =?iso-8859-1?Q?JMu4NzLXagHTVSRxjtPIVFid23ZCkwm3+lCmGs9ii8cFwrD3A0tYbLYZhP?=\r\n =?iso-8859-1?Q?Vi0KXgl69SerYRs0tDpMGn7cIdBWBKQB8WYANEYhUjJ7IGQSjsuxNfmUim?=\r\n =?iso-8859-1?Q?SE1kTpWmMnv8n4key7aZRHhRFCMO09L3DOFO4wROh5xK1kwuW5SAjrVLb+?=\r\n =?iso-8859-1?Q?4k8QGqv1HZpP7iPS1cdCaSQwgoPkkrd05o3Bm05t/t4LlP06tw+iNbD9zr?=\r\n =?iso-8859-1?Q?wzAJpvtAfMqOXrDU9SwCC5v7kKu/RZ0NfmQ0mrvbwUG1CWUA57jBack7wj?=\r\n =?iso-8859-1?Q?d3Y7It1HkgJBLC5Kgkj+cCf455nANGErOvN9fzLfMnF1iIBgJTPOhL+Rkw?=\r\n =?iso-8859-1?Q?6spCn5AaGbhupgga29j9ksY55sb3wb++D45z4qUz14VLBfVJ4vRFjPVGIK?=\r\n =?iso-8859-1?Q?jx9Jvz5rmvrEHcm9bgrXuiruG5Twh2GSlaCnq793+DPy1qkvswdJxC0R/+?=\r\n =?iso-8859-1?Q?8f2mzsWGdz?=",
+            "x-ms-exchange-antispam-messagedata-chunkcount": "x-ms-exchange-antispam-messagedata-chunkcount: 1",
+            "x-ms-exchange-antispam-messagedata-0": "x-ms-exchange-antispam-messagedata-0:\r\n =?iso-8859-1?Q?oyNfR2bJ+h3qu7VEk/AXZA/J6jjZZ8zf2jcyoxG0TZcUSeCp0eaLSJGlsc?=\r\n =?iso-8859-1?Q?YDdrJdzSifjO0JbFGo4F1QR7LIFUWZrUYwpA8O2iLmPVotULBPAYvr6qSs?=\r\n =?iso-8859-1?Q?RoT3nus82fZ2HO2Uh1eHQiin8XUMDFU0YUOu2/0k5mJRlwj6SGAGG/2M/5?=\r\n =?iso-8859-1?Q?x18V9ZCbRPveZccP80YbRUAqaF/OvTl5H/0Z41DeLeToi7mH+lJx3modJS?=\r\n =?iso-8859-1?Q?KeGQRI39vQukpHjIPyCLOgycADzupNVGTdc0Ft+04xkOjd6VjcSVeS6wxx?=\r\n =?iso-8859-1?Q?Xb8MzzJrrI1EIPG9/0LvPwf3s4R1JXdHfLjE1HdOEWiODWJnNue1Ug9thM?=\r\n =?iso-8859-1?Q?XUvlISf66p7+CZrn/IE0dpp4ZrSP8XvLjdAdvj9Rf8pmSb5/kHKR9aP/Wy?=\r\n =?iso-8859-1?Q?2/2Vpxhh2p7W8/9Oa/d/SX9BxtlvEB6mAxkX8/i14FG7pA5xZQISiQtxm5?=\r\n =?iso-8859-1?Q?dMkmU28uNbBrU5Q4XvuVDOWYKFmcWuKAGL8oHRSH4J8BzVbW+t1bL8KF8G?=\r\n =?iso-8859-1?Q?26yt+wnSiEX9xkbEX/4JffYXq5JdokY/Z64E7djDEv0TVcu8Pln0i1ZmFk?=\r\n =?iso-8859-1?Q?8Jf8TlEgotkQ1SU9BEwzjxbVr69/3L1gdZfWNtMcPkiJhQoVp94feejMd6?=\r\n =?iso-8859-1?Q?vlx2C2oWvUBrs/UNfZL6Dyqr+JgVxjtjCFgv3eTMk9EO53v6MIeeREel9V?=\r\n =?iso-8859-1?Q?3pm9nupO+1QtolymkQxpfTP6h/3NeK2T4mocslqkjvKhp5PYUh0oGbBb/n?=\r\n =?iso-8859-1?Q?opndexpMAPU+tGUpBgY7WbO7X/7RpzQzqReL+KsphBp+wfi0neKdRYLU3O?=\r\n =?iso-8859-1?Q?1q74HK7f+LmZWvtZefxln2WcLlsrn4ElZPu17PtMTbpVVMRWb7T9JVWFwX?=\r\n =?iso-8859-1?Q?Im3uH2se6taNehYrakFpaRoztomWeFG3DSraFyyy+7KmmbManRbRTxZJpe?=\r\n =?iso-8859-1?Q?DkC6rOYFO1R1kNqzmTKxKSAPuzwCQfKDYk1NIM5cln6S4CqaGC1X7mouUn?=\r\n =?iso-8859-1?Q?PZJZjZY52LhNK9vCE4LS5p/bzkSprMWnvKJNlRBMl+AALr7BGepH0ms95S?=\r\n =?iso-8859-1?Q?ds8GZ/4HbwUSkpIB7oa32jSUm4gEpfXUN8Rp40fR9kXdRUaMNM3rJRKU6Y?=\r\n =?iso-8859-1?Q?3PLxK6jX+Ng8k8+3DSXhOCMTFh6M63AMP1wrb0KSIUosbEBqQHNgeXOGfZ?=\r\n =?iso-8859-1?Q?uGTkx6nH0t+M12E2OlcEXmZ63zXvtOaeQElQm55Y7z663EQfiqDwHTeqqf?=\r\n =?iso-8859-1?Q?Ut1k98KBd9BPrVE0NYyXaXW9bVQvbK0HJ/o6t9HhxWqUp6EL80DLMH1aua?=\r\n =?iso-8859-1?Q?aOTTwNiPjbGPGIw8UUf/pazz+MWbPiig9xek+DSYVC2OpHfgfptw5HiXCY?=\r\n =?iso-8859-1?Q?o4OlsvWC6N0exAVikx9W+puiAJpdCnc1uw8VJ0mXzCZ5XRSxgRqm428cYT?=\r\n =?iso-8859-1?Q?LsAYDqMCM9Mwm06a?=",
+            "content-type": "Content-Type: multipart/alternative;\r\n\tboundary=\"_000_CPWPR80MB8993F177992F73B2A04F2ACCCD98ACPWPR80MB8993lamp_\"",
+            "mime-version": "MIME-Version: 1.0",
+            "x-originatororg": "X-OriginatorOrg: sct-15-20-9412-4-msonline-outlook-8eed7.templateTenant",
+            "x-ms-exchange-crosstenant-authas": "X-MS-Exchange-CrossTenant-AuthAs: Internal",
+            "x-ms-exchange-crosstenant-authsource": "X-MS-Exchange-CrossTenant-AuthSource: CPWPR80MB8993.lamprd80.prod.outlook.com",
+            "x-ms-exchange-crosstenant-rms-persistedconsumerorg": "X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000",
+            "x-ms-exchange-crosstenant-network-message-id": "X-MS-Exchange-CrossTenant-Network-Message-Id: bdc9e131-2047-48e4-f633-08de63845058",
+            "x-ms-exchange-crosstenant-originalarrivaltime": "X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Feb 2026 00:28:26.7848\r\n (UTC)",
+            "x-ms-exchange-crosstenant-fromentityheader": "X-MS-Exchange-CrossTenant-fromentityheader: Hosted",
+            "x-ms-exchange-crosstenant-id": "X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa",
+            "x-ms-exchange-transport-crosstenantheadersstamped": "X-MS-Exchange-Transport-CrossTenantHeadersStamped: RO2PR80MB7578"
+          },
+          "html": "<html>\n<head>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n<style type=\"text/css\" style=\"display:none;\"> P {margin-top:0;margin-bottom:0;} </style>\n</head>\n<body dir=\"ltr\">\n<div style=\"font-family: Calibri, Helvetica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0);\" class=\"elementToProof\">\nOlá, boa noite!</div>\n<div style=\"font-family: Calibri, Helvetica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0);\" class=\"elementToProof\">\n<br>\n</div>\n<div style=\"font-family: Calibri, Helvetica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0);\" class=\"elementToProof\">\nGostaria de saber como funciona o curso de n8n.</div>\n<div style=\"font-family: Calibri, Helvetica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0);\" class=\"elementToProof\">\n<br>\n</div>\n<div style=\"font-family: Calibri, Helvetica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0);\" class=\"elementToProof\">\nFico no aguardo.</div>\n<div style=\"font-family: Calibri, Helvetica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0);\" class=\"elementToProof\">\n<br>\n</div>\n<div style=\"font-family: Calibri, Helvetica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0);\" class=\"elementToProof\">\nAbraços.</div>\n<div style=\"font-family: Calibri, Helvetica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0);\" class=\"elementToProof\">\n<br>\n</div>\n</body>\n</html>\n",
+          "text": "Olá, boa noite!\n\nGostaria de saber como funciona o curso de n8n.\n\nFico no aguardo.\n\nAbraços.\n\n",
+          "textAsHtml": "<p>Ol&aacute;, boa noite!</p><p>Gostaria de saber como funciona o curso de n8n.</p><p>Fico no aguardo.</p><p>Abra&ccedil;os.</p>",
+          "subject": "Dúvida curso n8n",
+          "date": "2026-02-04T00:28:26.000Z",
+          "to": {
+            "value": [
+              {
+                "address": "rbezerra18@gmail.com",
+                "name": "Roberto Bezerra"
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Roberto Bezerra</span> &lt;<a href=\"mailto:rbezerra18@gmail.com\" class=\"mp_address_email\">rbezerra18@gmail.com</a>&gt;</span>",
+            "text": "\"Roberto Bezerra\" <rbezerra18@gmail.com>"
+          },
+          "from": {
+            "value": [
+              {
+                "address": "rbezerra18@hotmail.com",
+                "name": "Roberto Júnior"
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Roberto J&#xFA;nior</span> &lt;<a href=\"mailto:rbezerra18@hotmail.com\" class=\"mp_address_email\">rbezerra18@hotmail.com</a>&gt;</span>",
+            "text": "\"Roberto Júnior\" <rbezerra18@hotmail.com>"
+          },
+          "messageId": "<CPWPR80MB8993F177992F73B2A04F2ACCCD98A@CPWPR80MB8993.lamprd80.prod.outlook.com>"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "225f5485-2e2a-4751-9ef0-4535caf8cd9b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a11dca2481091794aff933e363963a7f73f93e7797baa1e2c446e8e94974b9c9"
+  },
+  "id": "oKG96Xezbn6QyvTxZoHin",
+  "tags": []
+}
