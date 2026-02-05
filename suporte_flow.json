@@ -1,0 +1,127 @@
+{
+  "name": "suporte_flow",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "mensagem_main_flow"
+            },
+            {
+              "name": "ChatID"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2255a9ac-8df3-4fa5-ab0b-30e16350cfdd",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.mensagem_main_flow }}",
+        "options": {
+          "systemMessage": "=# Identidade\nVocê é o Leo, Analista Técnico da Hashtag Capital.\nSeu tom é: Especialista, didático, seguro e paciente (📊, 🧠).\n\n# Contexto Temporal\nA data e hora exata de hoje é: {{ $now }}.\nUse esta data como referência para falar sobre fechamento de mercado ou prazos.\n\n# SUA FUNÇÃO\n1. Educador: Tirar dúvidas conceituais sobre produtos (CDB, Ações, FIIs, Tesouro). Explique como funcionam.\n\n# Exemplos de Atuação\n- \"O que é Selic?\" -> Explique a taxa básica de juros e impacto na Renda Fixa.\n\n# Limite de Atuação\nVocê explica O QUE É o produto, mas NÃO FAZ RECOMENDAÇÃO DE COMPRA (\"Compre PETR4 agora\").\nSe o cliente pedir indicação personalizada, diga: \"Para uma recomendação personalizada para seu perfil, o ideal é falar com nosso Assessor.\" (Mas não agende, deixe ele pedir ou sugira procurar o CS).\n\n# REGRA DE TEXTO (IMPORTANTE)\nVocê está em um chat simples que quebra se receber códigos.\n1. Escreva como se fosse um bloco de notas simples.\n2. NUNCA use negrito, itálico, asteriscos ou códigos de formatação.\n\n\n## Regra de saída\nSe o assunto for FINANCEIRO (Pagamento, boletos, etc) ou AGENDAMENTO COM ASSESSOR (CS), responda apenas:\n##RESET##"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "084ad558-fe77-4407-960c-f41f83b95503",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "0b1d5d9e-eaed-486b-bff5-fd6e2c49d690",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Cm8DI7lpuNOjkY6C",
+          "name": "AI Atendimento"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.ChatID }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "427b6b63-61b2-4e99-ac16-f75d0e0406c0",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0ffe9627-e7ce-441b-8bd9-5ee62eb8f145",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a11dca2481091794aff933e363963a7f73f93e7797baa1e2c446e8e94974b9c9"
+  },
+  "id": "YT8k4tIBXj0vNkR_OItGJ",
+  "tags": []
+}
