@@ -1,0 +1,236 @@
+{
+  "name": "extrator_gmaps",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "826f1f27-38ba-425a-b09b-4e0cc66e4701",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://api.apify.com/v2/acts/compass~google-maps-extractor/run-sync-get-dataset-items?token=apify_api_****************",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"language\": \"pt-BR\",\n    \"locationQuery\": \"Rio de Janeiro, Brazil\",\n    \"maxCrawledPlacesPerSearch\": 20,\n    \"searchMatching\": \"all\",\n    \"searchStringsArray\": [\n        \"diagnóstico por imagem veterinária\"\n    ],\n    \"skipClosedPlaces\": true,\n    \"website\": \"allPlaces\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "55f07eac-3112-43f1-88b3-ec4abafcfeca",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "title",
+        "include": "selectedOtherFields",
+        "fieldsToInclude": "title, address, city, postalCode, website, phoneUnformatted, totalScore, url",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "77bf4307-061a-4993-b5fe-bbb0cba16161",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1UFryVVhUzOYYFm-nyl7Q-acrAmg57A7RcziIIdaqsjM",
+          "mode": "list",
+          "cachedResultName": "Informações_MercadoVetRJ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UFryVVhUzOYYFm-nyl7Q-acrAmg57A7RcziIIdaqsjM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1250211987,
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UFryVVhUzOYYFm-nyl7Q-acrAmg57A7RcziIIdaqsjM/edit#gid=1250211987"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nome": "={{ $json.title }}",
+            "Endereço": "={{ $json.address }}",
+            "Cidade": "={{ $json.city }}",
+            "CEP": "={{ $json.postalCode }}",
+            "Site": "={{ $json.website }}",
+            "Telefone": "={{ $json.phoneUnformatted }}",
+            "Avaliação": "={{ $json.totalScore }}",
+            "Maps": "={{ $json.url }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Nome",
+              "displayName": "Nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Endereço",
+              "displayName": "Endereço",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cidade",
+              "displayName": "Cidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CEP",
+              "displayName": "CEP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Site",
+              "displayName": "Site",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Telefone",
+              "displayName": "Telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Avaliação",
+              "displayName": "Avaliação",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Maps",
+              "displayName": "Maps",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        0
+      ],
+      "id": "42d90c39-d532-47a0-925d-dc3e9c139185",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Isp6ADwsMs5r1hXS",
+          "name": "GS Mercado Vet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Extrator de informações do Google Maps com Apify\n- Criar HTTP Request para Apify com JSON\n- Separar itens com Split Out\n- Adicionar itens em planilha do Google ",
+        "width": 912
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -64,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "9e2f0eaa-48d9-4223-b894-9b7070c9bd6b",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "edc110e6-6abe-4fba-bfa8-716ad44c3e6a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5bbbf56f78c08d1febfccb301bed1a9bb3da957af041be5b4f54171bf9af9858"
+  },
+  "id": "VeNDR-_NUoguSBytqWESN",
+  "tags": []
+}

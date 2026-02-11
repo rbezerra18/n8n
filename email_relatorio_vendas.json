@@ -1,0 +1,126 @@
+{
+  "name": "email_relatorio_vendas",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "Quero um fluxo que me envia por e-mail um relatório/resumo das vendas estão em uma planilha",
+        "width": 480
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        288,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "00514185-eaa0-4205-95be-2b3f41ba5f30",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        352,
+        304
+      ],
+      "id": "d4a05527-d400-4178-81fd-f87f6fb3a40f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "sum",
+              "field": "Valor Total"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "Produto",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        752,
+        304
+      ],
+      "id": "99145969-37b1-47f9-9a44-668614102b72",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1FZhA2NvIA95zQQ5TC4hrx4O8Czs1JdBCqxokTffxfDE",
+          "mode": "list",
+          "cachedResultName": "Base Vendas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FZhA2NvIA95zQQ5TC4hrx4O8Czs1JdBCqxokTffxfDE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1587662590,
+          "mode": "list",
+          "cachedResultName": "Vendas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FZhA2NvIA95zQQ5TC4hrx4O8Czs1JdBCqxokTffxfDE/edit#gid=1587662590"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        304
+      ],
+      "id": "d896f492-fb19-419f-b551-bcf3c3d09598",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "W0wsuLEDKIINNfnb",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "America/Sao_Paulo",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "3999d10b-1856-42db-a9e9-b3c6e664dd4c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5bbbf56f78c08d1febfccb301bed1a9bb3da957af041be5b4f54171bf9af9858"
+  },
+  "id": "dhrc_d9e3Etomrxk5XDms",
+  "tags": []
+}

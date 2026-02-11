@@ -1,0 +1,246 @@
+{
+  "name": "resumo_links_email",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "212a3c17-665f-45bd-9cca-177a065ca7ce",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1MBZARgeVOvxNSrz4Cm77CAh9VOvDDw7GUYeCGs336q0",
+          "mode": "list",
+          "cachedResultName": "Resumo n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MBZARgeVOvxNSrz4Cm77CAh9VOvDDw7GUYeCGs336q0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2016375791,
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MBZARgeVOvxNSrz4Cm77CAh9VOvDDw7GUYeCGs336q0/edit#gid=2016375791"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "752a7197-f66a-46c0-8901-481aa06f5e40",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "s5Es18i0mo13WsG7",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['Link do Artigo'] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Chrome/107.0.0.0"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "831275ac-b9a0-46aa-9f91-6d5e1b445d43",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "textoExtraido",
+              "cssSelector": "p",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "8311bc25-5fd7-4ff9-a136-0801ba955300",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "content": "#### Fluxo para resumir conteúdo de uma lista de sites e enviar por e-mail diariamente\n- Criar gatilho (diário, às 09h)\n- Selecionar sites de uma planilha\n- Acessar os sites da lista\n- Retirar dos sites, o conteúdo de texto\n- Usar IA Gemini para resumir em 5 tópicos cada site pesquisado\n- Enviar um e-mail com o resumo do site conforme lista de e-mails da planilha",
+        "height": 192,
+        "width": 656
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -48,
+        -240
+      ],
+      "typeVersion": 1,
+      "id": "203c2207-7179-4442-b391-caafc214a3f6",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Você é um assistente especializado em análise e síntese de textos.\n\nTarefa:\n- Analise cuidadosamente todos os textos fornecidos como entrada (podem estar em um ou mais idiomas).\n- Gere um resumo consolidado do conteúdo total.\n\nRegras obrigatórias:\n1. O resumo deve conter EXATAMENTE 5 tópicos.\n2. Cada tópico deve ser claro, objetivo e representar uma ideia central do conjunto dos textos.\n3. Não copie trechos literalmente; faça uma síntese com suas próprias palavras.\n4. Ignore o idioma original dos textos analisados.\n5. TODO o conteúdo gerado deve estar obrigatoriamente em português do Brasil (pt-BR).\n\nFormato de saída:\n- Use uma lista numerada de 1 a 5.\n- Cada item deve conter um pequeno parágrafo explicativo (2 a 4 linhas).\n\nEntrada para análise:\n{{ $json.textoExtraido }}\n\nResponda apenas com os 5 tópicos numerados, sem comentários adicionais."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        0
+      ],
+      "id": "274595fc-2ff5-41a8-b162-bce6acfb36d4",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Cm8DI7lpuNOjkY6C",
+          "name": "AI Atendimento"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Get row(s) in sheet').item.json.Email }}",
+        "subject": "=Resumo do site: {{ $('Get row(s) in sheet').item.json['Link do Artigo'] }}",
+        "emailType": "text",
+        "message": "=Resumo:\n{{ $json.content.parts[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        0
+      ],
+      "id": "a4b075f7-ff68-43ae-9511-c756b5421d23",
+      "name": "Send a message",
+      "webhookId": "a0b34599-1cd9-40e3-993e-c3ef7a34fe17",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kPrFYv9OqpNKEM65",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "2d44ec0c-ef99-4418-915c-0b5f1a5d0e3f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a11dca2481091794aff933e363963a7f73f93e7797baa1e2c446e8e94974b9c9"
+  },
+  "id": "mXQhyGM2Tr3O-90mbBCpI",
+  "tags": []
+}

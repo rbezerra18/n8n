@@ -1,0 +1,208 @@
+{
+  "name": "registro_depesas",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "efcc9b5f-1549-4af8-9c87-0a0be4539952",
+      "name": "Telegram Trigger",
+      "webhookId": "f60f341c-f5d5-43c1-a1de-aaf3a95a4c5c",
+      "credentials": {
+        "telegramApi": {
+          "id": "nkgVgCwUEni1P93Z",
+          "name": "Telegram Despesas Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node (JavaScript)\n// Retorna um array com objetos prontos para o Google Sheets.\n// Trata mensagens no formato: descricao/categoria/valor/formapagamento\n// Observação: a mensagem do Telegram geralmente está em item.json.message.text\n\nconst pad = (n) => n.toString().padStart(2, '0');\n\nconst output = items.map((item) => {\n  try {\n    // Pega o objeto da mensagem (telegram coloca em item.json.message)\n    const msgObj = item.json?.message || item.json;\n    const text = (msgObj?.text || msgObj?.caption || \"\").toString().trim();\n\n    if (!text) {\n      return { json: { error: 'Mensagem sem texto', original: item.json } };\n    }\n\n    // Split a partir do fim: permite que a descrição contenha \"/\"\n    const parts = text.split('/');\n    const formaPagamento = (parts.pop() || '').trim();\n    const valorRaw = (parts.pop() || '').trim();\n    const categoria = (parts.pop() || '').trim();\n    const descricao = parts.join('/').trim(); // junta o que sobrou (descrição)\n\n    // Normaliza/parseia o valor\n    let valorClean = valorRaw.replace(/\\s/g, '')       // remove espaços\n                             .replace(/[Rr]\\$/g, '')   // remove \"R$\"\n                             .replace(/\\./g, '')       // remove separador de milhares\n                             .replace(',', '.');       // vírgula -> ponto\n    const valorNum = isNaN(Number(valorClean)) ? valorRaw : Number(valorClean);\n\n    // Data/hora: se Telegram enviou timestamp (seconds since epoch) usa isso\n    let msgDate;\n    if (msgObj?.date) {\n      msgDate = new Date(msgObj.date * 1000);\n    } else {\n      msgDate = new Date();\n    }\n\n    const YYYY = msgDate.getFullYear();\n    const MM = pad(msgDate.getMonth() + 1);\n    const DD = pad(msgDate.getDate());\n    const hh = pad(msgDate.getHours());\n    const mm = pad(msgDate.getMinutes());\n    const ss = pad(msgDate.getSeconds());\n\n    const dataISO = `${YYYY}-${MM}-${DD}`;\n    const dataBR = `${DD}/${MM}/${YYYY}`;\n    const hora = `${hh}:${mm}:${ss}`;\n    const dataHoraISO = `${dataISO}T${hh}:${mm}:${ss}Z`;\n\n    // Carimbo único baseado na data/hora do envio + sufixo aleatório de 4 dígitos\n    const idStamp = `ID-${YYYY}${MM}${DD}${hh}${mm}${ss}-${Math.floor(Math.random() * 9000 + 1000)}`;\n\n    return {\n      json: {\n        ID: idStamp,\n        DataISO: dataISO,\n        DataBR: dataBR,\n        Hora: hora,\n        DataHoraISO: dataHoraISO,\n        Descricao: descricao,\n        Categoria: categoria,\n        Valor: valorNum,\n        ValorRaw: valorRaw,\n        FormaPagamento: formaPagamento,\n        originalMessage: item.json\n      }\n    };\n  } catch (err) {\n    return { json: { error: err.message, original: item.json } };\n  }\n});\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "6eb485f4-9dad-4dee-ac5c-0e9919ce4eb3",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1yfmRvABMMsh5WIXvPYI6A__iLwo9SOHrzFEXYNZcRYs",
+          "mode": "list",
+          "cachedResultName": "Despesas_Pessoais",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yfmRvABMMsh5WIXvPYI6A__iLwo9SOHrzFEXYNZcRYs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 848487740,
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yfmRvABMMsh5WIXvPYI6A__iLwo9SOHrzFEXYNZcRYs/edit#gid=848487740"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Data",
+              "displayName": "Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Descrição",
+              "displayName": "Descrição",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Categoria",
+              "displayName": "Categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Valor",
+              "displayName": "Valor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Forma de Pagamento",
+              "displayName": "Forma de Pagamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        0
+      ],
+      "id": "7bf4b64d-a77d-43e7-86a5-6b16138db424",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "G14t2LAbrASUIf3l",
+          "name": "GS Despesas Pessoais"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=A despesa XXXX foi inserida com sucesso.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "16f53ed6-d899-44d1-b77c-f939706d3955",
+      "name": "Send a text message",
+      "webhookId": "e2974bb0-caae-4832-84b8-8376a9942e46",
+      "credentials": {
+        "telegramApi": {
+          "id": "nkgVgCwUEni1P93Z",
+          "name": "Telegram Despesas Bot"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "3c6f0171-0099-4c85-8ae4-7544eceaecd1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5bbbf56f78c08d1febfccb301bed1a9bb3da957af041be5b4f54171bf9af9858"
+  },
+  "id": "t7uOFQlVpEeLIfMR46cAj",
+  "tags": []
+}

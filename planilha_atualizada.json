@@ -1,0 +1,310 @@
+{
+  "name": "planilha_atualizada",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1XBg5Wq3nw9zbTidj8lbu6zSQ2gi-fH61AgBGN6U_95s",
+          "mode": "list",
+          "cachedResultName": "SheetsParaEmail",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XBg5Wq3nw9zbTidj8lbu6zSQ2gi-fH61AgBGN6U_95s/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1334706183,
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XBg5Wq3nw9zbTidj8lbu6zSQ2gi-fH61AgBGN6U_95s/edit#gid=1334706183"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e77ade6c-b437-439e-bf8b-7428a6024208",
+      "name": "GS Planilha Atualizada",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "eLodnbRzkdv8X3RT",
+          "name": "GS Planilha Atualizada"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U06FU6UE6D6",
+          "mode": "list",
+          "cachedResultName": "rbezerra18"
+        },
+        "text": "=Olá! Segue novo pedido:\nCliente: {{ $json['Nome do Cliente'] }}\nProduto: {{ $json.Produto }}\nQuantidade: {{ $json['Quantidade '] }}\nE-mail: {{ $json['E-mail do Cliente'] }}\nData: {{ new Date(( $('GS Planilha Atualizada').item.json['Data da Venda'] - 25569) * 86400 * 1000).toLocaleDateString('pt-BR') }}\nVendedor: {{ $json['Responsável Comercial'] }}\nEndereço: {{ $json['Endereço'] }}\nImplantação: {{ new Date(( $('GS Planilha Atualizada').item.json['Data de Implementação'] - 25569) * 86400 * 1000).toLocaleDateString('pt-BR') }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        416,
+        -112
+      ],
+      "id": "0c7cb416-1cd5-4ca3-8e9b-237f50d1bdd1",
+      "name": "Send a message",
+      "webhookId": "ed407669-df5e-45b0-8f3e-9774c8a2585b",
+      "credentials": {
+        "slackApi": {
+          "id": "OBMcpd1YF2jRJL0j",
+          "name": "Slack API Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('GS Planilha Atualizada').item.json['E-mail do Cliente'] }}",
+        "subject": "O seu pedido foi confirmado!",
+        "emailType": "text",
+        "message": "=O seu pedido foi confirmado!\nProduto: {{ $('GS Planilha Atualizada').item.json.Produto }}\nQuantidade: {{ $('GS Planilha Atualizada').item.json['Quantidade '] }}\nEndereço: {{ $('GS Planilha Atualizada').item.json['Endereço'] }}\nData de Implementação: {{ new Date(( $('GS Planilha Atualizada').item.json['Data de Implementação'] - 25569) * 86400 * 1000).toLocaleDateString('pt-BR') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        -112
+      ],
+      "id": "26609d3a-8214-47f7-84f8-a87667afdcd5",
+      "name": "Send a message1",
+      "webhookId": "aecbee2b-308e-42b4-8270-95bdd8a0ed8a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "NZhNld5Cq5xzDaxQ",
+          "name": "Gmail Planilha Atualizada"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0e56659d-dab2-4171-be17-8c8f85ec706c",
+              "leftValue": "={{ $json['Nome do Cliente'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b351a623-4c5a-4053-8776-1464b6efd68d",
+              "leftValue": "={{ $json.Produto }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "ed6c503f-d534-45d5-829e-c71630263783",
+              "leftValue": "={{ $json['Quantidade '] }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7b541c7b-b456-4d3d-8242-57917457d863",
+              "leftValue": "={{ $json['E-mail do Cliente'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "d94a1cd4-6d22-4704-bdee-38d5b8a828cb",
+              "leftValue": "={{ $json['Data da Venda'] }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "a353dbb0-16ad-401c-acc4-63ff6c3cb86f",
+              "leftValue": "={{ $json['Responsável Comercial'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "5423cbb6-ca2a-4196-ab5e-c5159b621394",
+              "leftValue": "={{ $json['Endereço'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c0696f66-d979-4c29-9288-93027e5c4607",
+              "leftValue": "={{ $json['Data de Implementação'] }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "60fb8e6f-277c-453a-b303-bd3ada2e51aa",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U06FU6UE6D6",
+          "mode": "list",
+          "cachedResultName": "rbezerra18"
+        },
+        "text": "Há itens na planilha com informação faltante.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        416,
+        96
+      ],
+      "id": "727c63d0-4495-4fc8-99c5-8327ca22941b",
+      "name": "Send a message2",
+      "webhookId": "9f95fafb-3df0-4ecc-b021-a1e133d5d6c9",
+      "credentials": {
+        "slackApi": {
+          "id": "OBMcpd1YF2jRJL0j",
+          "name": "Slack API Token"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        624,
+        96
+      ],
+      "id": "0f43db40-3bfb-4f90-8af7-ba9bea93d66f",
+      "name": "No Operation, do nothing"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "GS Planilha Atualizada": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message2": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "119c7bac-ce1d-480f-8790-7b53dcd0728d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5bbbf56f78c08d1febfccb301bed1a9bb3da957af041be5b4f54171bf9af9858"
+  },
+  "id": "RkeCRcwquilgM8Eifu4fO",
+  "tags": []
+}

@@ -1,0 +1,85 @@
+{
+  "name": "relatorio_vendas",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "Quero um fluxo que me envia por e-mail um relatório/resumo das vendas estão em uma planilha",
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -352,
+        -304
+      ],
+      "typeVersion": 1,
+      "id": "767f5557-c623-4dd2-a910-662e2e27de6d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bd298945-0536-4e09-961c-8d816d0b6b86",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8ff134e9-de0b-4423-8157-f7593ec44b05",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "s5Es18i0mo13WsG7",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "2c056361-63d1-4aa8-b9e2-358a10f5d83a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a11dca2481091794aff933e363963a7f73f93e7797baa1e2c446e8e94974b9c9"
+  },
+  "id": "KfOyV6FrW4DVag6UQOac2",
+  "tags": []
+}

@@ -1,0 +1,261 @@
+{
+  "name": "extrator_booking",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7866239e-6eb6-4be7-b6c3-8e9451a655ed",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/voyager~booking-scraper/run-sync-get-dataset-items?token=apify_api_****************",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n    \"currency\": \"BRL\",\n    \"language\": \"pt-br\",\n    \"maxItems\": 20,\n    \"minMaxPrice\": \"0-999999\",\n    \"propertyType\": \"Apartments\",\n    \"search\": \"Copacabana, Rio de Janeiro\",\n    \"sortBy\": \"distance_from_search\",\n    \"starsCountFilter\": \"any\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "6586b676-3a1e-4f46-82aa-225246ff5936",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "order",
+        "include": "selectedOtherFields",
+        "fieldsToInclude": "url, name, rating, reviews, checkIn, checkOut, address",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        656,
+        0
+      ],
+      "id": "c6be3c3a-ed92-4980-a42a-a8ed1a28abc6",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1aSFhDauqbrRbCiwhXmfoFSCn6z6H9X63OSxI7GNhEvA",
+          "mode": "list",
+          "cachedResultName": "Informações_Booking_Copacabana_RJ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aSFhDauqbrRbCiwhXmfoFSCn6z6H9X63OSxI7GNhEvA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1250211987,
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UFryVVhUzOYYFm-nyl7Q-acrAmg57A7RcziIIdaqsjM/edit#gid=1250211987"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Endereço": "={{ $json.address }}",
+            "Link": "={{ $json.url }}",
+            "Nome": "={{ $json.name }}",
+            "Nota": "={{ $json.rating }}",
+            "Avaliações": "={{ $json.reviews }}",
+            "Check-in": "={{ $json.checkIn }}",
+            "Check-Out": "={{ $json.checkOut }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nome",
+              "displayName": "Nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nota",
+              "displayName": "Nota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Avaliações",
+              "displayName": "Avaliações",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Check-in",
+              "displayName": "Check-in",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Check-Out",
+              "displayName": "Check-Out",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Endereço",
+              "displayName": "Endereço",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        864,
+        0
+      ],
+      "id": "9a458bea-cad8-4fd6-ab38-64ebd8168fd8",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1iuWMV0mG1zeK4tV",
+          "name": "GS Booking"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Extrator de informações do Booking com Apify\n- Criar HTTP Request para Apify com JSON (POST)\n- Replicar o HTTP Request para Apify com JSON (GET)\n- Separar itens com Split Out\n- Adicionar itens em planilha do Google ",
+        "width": 912
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -64,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "19546ae7-a028-4747-a6b7-500a26fa26fe",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "url": "https://api.apify.com/v2/acts/voyager~booking-scraper/runs/last/dataset/items?token=apify_api_****************",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n    \"currency\": \"BRL\",\n    \"language\": \"pt-br\",\n    \"maxItems\": 20,\n    \"minMaxPrice\": \"0-999999\",\n    \"propertyType\": \"Apartments\",\n    \"search\": \"Copacabana, Rio de Janeiro\",\n    \"sortBy\": \"distance_from_search\",\n    \"starsCountFilter\": \"any\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        432,
+        0
+      ],
+      "id": "b0f97206-52e1-4856-9376-6601e7935e70",
+      "name": "Get"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Get",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "13cbbc33-a174-441a-a629-448e10327ee3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5bbbf56f78c08d1febfccb301bed1a9bb3da957af041be5b4f54171bf9af9858"
+  },
+  "id": "YV3lPYx4T8kGbWIm",
+  "tags": []
+}

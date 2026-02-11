@@ -1,0 +1,76 @@
+{
+  "name": "registro_faturas",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2a86b6e5-92f0-4778-b1ff-55ede11900ea",
+      "name": "Telegram Trigger",
+      "webhookId": "350a0b6f-734b-47f3-9898-70c7da0476b4",
+      "credentials": {
+        "telegramApi": {
+          "id": "qPTDSVN8vbo3g0bA",
+          "name": "Telegram Registro Faturas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "46f54ab2-d0e1-4cf5-a390-37699620dfd7",
+      "name": "Get a file",
+      "webhookId": "dd46031d-c002-47b3-a833-dab11ddd6ea5",
+      "credentials": {
+        "telegramApi": {
+          "id": "qPTDSVN8vbo3g0bA",
+          "name": "Telegram Registro Faturas"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "78cc0353-6c22-4dbe-857f-6618dc90d344",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5bbbf56f78c08d1febfccb301bed1a9bb3da957af041be5b4f54171bf9af9858"
+  },
+  "id": "fNY2TwPGUz4deX9IyJG8O",
+  "tags": []
+}
