@@ -1,0 +1,354 @@
+{
+  "updatedAt": "2026-02-22T22:38:16.694Z",
+  "createdAt": "2026-02-13T01:25:22.378Z",
+  "id": "v5dyfZ_TJm-oi2L0KOh7U",
+  "name": "registro_fatura_telegram",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4784b8a0-cb02-44ad-b485-0ae987ad6207",
+      "name": "Telegram Trigger",
+      "webhookId": "2adde9c4-9c84-4eef-b6b9-732015ce129c",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Registro Faturas por Telegram\n- Receber documento pelo Telegram\n- Baixar o arquivo\n- Extrair dados do arquivo (OCR API)\n- Transformar dados com JS\n- Preencher dados em planilha\n- Repetir o download do arquivo (por segurança)\n- Fazer upload do arquivo na nuvem ",
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -48,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "7af089fb-9d90-4025-a0a9-679a321623c9",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.document.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "4c91818c-0994-43fb-8eb8-5fa45c8135c0",
+      "name": "Download do arquivo",
+      "webhookId": "9d1a0673-ee48-452b-9fa1-11fd41eb20cd",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ocr.space/parse/image",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "K87067925788957"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        448,
+        0
+      ],
+      "id": "e9f2a918-3fd0-410b-9f5c-0e7830a2e9e8",
+      "name": "Análise Fatura"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1BMQO63JRH6ga6WtFP1QHLVF6Mz7ilZV2XsfsqvXKlWM",
+          "mode": "list",
+          "cachedResultName": "ValorFaturas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BMQO63JRH6ga6WtFP1QHLVF6Mz7ilZV2XsfsqvXKlWM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BMQO63JRH6ga6WtFP1QHLVF6Mz7ilZV2XsfsqvXKlWM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Número Fatura": "={{ $json.NumeroFatura }}",
+            "Vencimento": "={{ $json.DataVencimento }}",
+            "Valor Total (R$)": "={{ $json.ValorTotal }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Número Fatura",
+              "displayName": "Número Fatura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vencimento",
+              "displayName": "Vencimento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Valor Total (R$)",
+              "displayName": "Valor Total (R$)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        896,
+        0
+      ],
+      "id": "9861a51c-167a-48be-9b45-3b68d77d2c34",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Append row in sheet').item.json['Número Fatura'] }} [{{ $now.format('dd-MM-yyyy') }}]",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1oZ5kTzLbZcLf7ViTjZSKkY-z1EBxbg9O",
+          "mode": "list",
+          "cachedResultName": "Faturas",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1oZ5kTzLbZcLf7ViTjZSKkY-z1EBxbg9O"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1344,
+        0
+      ],
+      "id": "0ea2a29b-1de4-4bca-8140-4ceda9dc809c",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $json['ParsedResults'][0]['ParsedText']\n  .normalize(\"NFD\")\n  .replace(/[\\u0300-\\u036f]/g, \"\")  // Remove accents\n  .replace(/\\s+/g, ' ')             // Collapse multiple spaces and line breaks\n  .trim();\n\nconsole.log(\"TEXT DEBUG:\", text);\n\n// Match variations like: \"Valor Total: R$ 456\", \"Valor Total: RS 456\", etc.\nconst valorMatch = text.match(/Valor\\s+Total\\s*[:\\-]?\\s*(?:R\\$|RS)?\\s*(\\d+[.,]?\\d{0,2})/i);\n\nconst parsedData = {\n  NumeroFatura: text.match(/Numero da Fatura\\s*[:\\-]?\\s*(\\S+)/i)?.[1] || null,\n  DataVencimento: text.match(/Data de Vencimento\\s*[:\\-]?\\s*(\\d{2}\\/\\d{2}\\/\\d{4})/i)?.[1] || null,\n  ValorTotal: valorMatch ? parseFloat(valorMatch[1].replace(',', '.')) : null\n};\n\nreturn [{ json: parsedData }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "3e6472db-f936-4ed6-9600-0eecfb85e9af",
+      "name": "Formatar dados"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.document.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "87f81a7c-6acd-4f89-b726-8a8ef59500c9",
+      "name": "Repetir download",
+      "webhookId": "c4474edf-9e31-4d79-bf73-7f64103118b0",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download do arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download do arquivo": {
+      "main": [
+        [
+          {
+            "node": "Análise Fatura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Análise Fatura": {
+      "main": [
+        [
+          {
+            "node": "Formatar dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Repetir download",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatar dados": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Repetir download": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e9be4a73-c441-4946-9636-98d1a427c9d1",
+  "activeVersionId": null,
+  "versionCounter": 98,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-13T01:25:22.400Z",
+      "createdAt": "2026-02-13T01:25:22.400Z",
+      "role": "workflow:owner",
+      "workflowId": "v5dyfZ_TJm-oi2L0KOh7U",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

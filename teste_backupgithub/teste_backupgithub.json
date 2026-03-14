@@ -1,0 +1,59 @@
+{
+  "updatedAt": "2026-03-11T20:00:13.000Z",
+  "createdAt": "2026-02-26T04:59:57.578Z",
+  "id": "HSn4vjTTiethQKFhsdg5U",
+  "name": "teste_backupGitHub",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7816ea04-17bc-4c90-8c17-6c078112dd38",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "e76f6398-0343-40bc-b6f1-0985489ee164",
+  "activeVersionId": null,
+  "versionCounter": 3,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-26T04:59:57.622Z",
+      "createdAt": "2026-02-26T04:59:57.622Z",
+      "role": "workflow:owner",
+      "workflowId": "HSn4vjTTiethQKFhsdg5U",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

@@ -1,0 +1,1076 @@
+{
+  "updatedAt": "2026-02-22T21:44:22.027Z",
+  "createdAt": "2026-02-22T04:20:33.895Z",
+  "id": "HN2ie4OR-IUIiYd5MX_dk",
+  "name": "urso_conhecimento",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8553ff30-32bc-4e21-9e9f-9ed757a7d676",
+              "name": "fileName",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "e9d53dd5-e387-4387-8a68-cb5311854b69",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "33980d92-7366-4a76-b1c3-1eda6fe3077e",
+              "name": "mimeType",
+              "value": "={{ $json.mimeType }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -720,
+        768
+      ],
+      "id": "297a7e01-6cc0-4af3-835b-2acc92b04eda",
+      "name": "Padronizar Dados"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "check_index",
+              "leftValue": "={{ $json.index }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "5efdfe56-b518-44ce-b631-66ac9c314266",
+      "name": "Possui Dados Antigos?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -272,
+        848
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const keysStr = $node[\"Redis (Get Index)\"].json.index || '';\nreturn keysStr.split(',').map(k => ({ json: { keyToDelete: k.trim() } }));"
+      },
+      "id": "ff7cbba4-a5b7-4acf-94e4-71730f7c3914",
+      "name": "Code (Prepare Delete)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        912
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Padronizar Dados').item.json.mimeType }}",
+                    "rightValue": "document",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "ce3d3673-9933-4d1f-a803-5aaa93ce5d3e"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ca8095bf-0d83-419b-9d3a-1071cafde71a",
+                    "leftValue": "={{ $('Padronizar Dados').item.json.mimeType }}",
+                    "rightValue": "spreadsheet",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1072,
+        768
+      ],
+      "id": "0e289a6e-a86e-4842-b93b-2d1ae984174a",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "redisIndex": {
+          "__rl": true,
+          "value": "=chunks:{{ $('Padronizar Dados').item.json.fileName }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreRedis",
+      "typeVersion": 1.3,
+      "position": [
+        1776,
+        768
+      ],
+      "id": "bf7198eb-5e09-4719-9d96-7c23cc350df6",
+      "name": "Redis Vector Store",
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1744,
+        992
+      ],
+      "id": "8e638b39-5a86-4edf-b3c2-cf6fa7437263",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "source",
+                "value": "={{ $json.source || $(\"Padronizar Dados\").first().json.fileName }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1872,
+        992
+      ],
+      "id": "51f25a9e-10f6-4f1f-b1b6-0ef7f376adbb",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {
+          "splitCode": "markdown"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1952,
+        1200
+      ],
+      "id": "14ba3663-8e8c-4a08-ad7d-81d2b221d6a4",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "operation": "keys",
+        "keyPattern": "=chunks:{{ $json.fileName }}:*",
+        "getValues": false
+      },
+      "id": "9aefdf91-e446-41b8-b343-008d76b7c43c",
+      "name": "Redis (Pré-Scan)",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        848,
+        768
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const pre = new Set($node[\"Redis (Pré-Scan)\"].json.keys || []);\nconst post = $node[\"Redis (Pós-Scan)\"].json.keys || [];\nconst fileName = $node[\"Padronizar Dados\"].json.fileName;\nconst diff = post.filter(k => !pre.has(k));\nreturn { fileName, ids: diff.join(',') };"
+      },
+      "id": "9c454d05-4c8c-4056-84f7-5ff8d184a769",
+      "name": "Calcular Chaves Novas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2688,
+        768
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=doc:idx:{{ $json.fileName }}",
+        "value": "={{ $json.ids }}"
+      },
+      "id": "d75922f5-9e35-4fc8-b640-635673d782ff",
+      "name": "Redis (Salvar Índice)",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2912,
+        768
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "keys",
+        "keyPattern": "=doc:chunks:{{ $('Padronizar Dados').item.json.fileName }}:*",
+        "getValues": false
+      },
+      "id": "9d429c58-b6dc-4ba4-840f-969f45ef82f3",
+      "name": "Redis (Pós-Scan)",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2464,
+        768
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "index",
+        "key": "=idx:{{ $('Padronizar Dados').item.json.fileName }}",
+        "options": {}
+      },
+      "id": "dd99ed99-4f82-455a-a0e4-9b4a16759ddf",
+      "name": "Redis (Get Index)",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        848
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $json.keyToDelete }}"
+      },
+      "id": "3d9dd76c-43d0-4c11-852e-8b795ecf5598",
+      "name": "Redis (Delete)",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        176,
+        912
+      ],
+      "executeOnce": false,
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Padronizar Dados').item.json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Dados",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1296,
+        864
+      ],
+      "id": "cd696395-316e-4ad3-989a-eafbde70ddac",
+      "name": "Ler Planilha",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('Padronizar Dados').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        672
+      ],
+      "id": "57153101-247f-4b39-b41b-41fb1c00b32b",
+      "name": "Ler Documento",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normaliza o conteúdo da planilha para texto\nconst fileName = $(\"Padronizar Dados\").first().json.fileName;\nconst type = $(\"Padronizar Dados\").first().json.mimeType;\n\nreturn $input.all().map(item => {\n  const rowText = Object.keys(item.json)\n    .map(key => `${key}: ${item.json[key] || ''}`)\n    .join(' | ');\n  return {\n    json: {\n      text: rowText,\n      source: fileName,\n      tipo: type\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        864
+      ],
+      "id": "2c7925dd-a895-481d-a471-d636fd93d30d",
+      "name": "Converter Linhas em Texto"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 11
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -944,
+        1296
+      ],
+      "id": "802e8498-e0a5-4338-9bb1-83043fff82a1",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "'1PjyM7IYa-5NnqSXCTljBNhUq_vfogOB5' in parents and trashed = false",
+        "returnAll": true,
+        "filter": {},
+        "options": {
+          "fields": []
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -720,
+        1296
+      ],
+      "id": "c06ac22f-6283-42ab-b7f1-fa2ef4a9bdf0",
+      "name": "Arquivos Deletados",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "chunks",
+        "key": "=doc:idx:{{ $json.fileName }}:*",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        1296
+      ],
+      "id": "bab99dc6-68ee-4634-8b12-ad35bba6237c",
+      "name": "Redis (Listar Chunks)",
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Pega todos os dados que vieram do Redis\nconst allItems = $input.all();\nlet results = [];\n\nfor (const item of allItems) {\n  // Pega a string de IDs (\"id1,id2...\")\n  const values = Object.values(item.json);\n  const keysStr = values.length > 0 ? values[0] : '';\n  \n  if (keysStr && typeof keysStr === 'string' && keysStr.trim() !== '') {\n    // Quebra a string e gera um novo item para cada ID\n    const chunks = keysStr.split(',').map(id => ({\n      json: { keyToDelete: id.trim() }\n    }));\n    results = results.concat(chunks);\n  }\n}\n\nreturn results;"
+      },
+      "id": "caaf17dd-1c3d-43ff-8151-8378877a946d",
+      "name": "Padronizar Chunks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        1200
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1PjyM7IYa-5NnqSXCTljBNhUq_vfogOB5"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "id": "8630f59a-8646-4d1e-8da0-4d031cc29f72",
+      "name": "Google Drive (Atualizado)",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -944,
+        864
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1PjyM7IYa-5NnqSXCTljBNhUq_vfogOB5"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "7dccdb5d-dae8-40d4-9beb-fcd255457940",
+      "name": "Google Drive (Criado)",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -944,
+        672
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        400,
+        768
+      ],
+      "id": "382c5007-02da-478f-8fe3-7d8982b63b98",
+      "name": "Merge"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        768
+      ],
+      "id": "062c6d57-380e-4ee8-a052-3c3221aae46b",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        624,
+        768
+      ],
+      "id": "d50e7fd7-60e5-4a2e-8b73-8570db260f91",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "content": "## Urso Conhecimento\n### - Aguarda o envio/alteração de arquivo na pasta CRM Imagem\n### - Verifica se o arquivo está armazenado no banco (index e chunks)\n###  - Caso positivo, deleta o arquivo e insere o novo no banco\n###   - Caso negativo, segue para inclusão do arquivo novo no banco",
+        "height": 176,
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1008,
+        368
+      ],
+      "typeVersion": 1,
+      "id": "a3770cd3-028f-4a32-9792-cfc0c39c9b2e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Urso Limpeza\n### - Diariamente, checa a pasta CRV Imagem para buscar arquivos que foram deletados e limpar os registros do banco (index e chunks)",
+        "height": 176,
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -992,
+        1072
+      ],
+      "typeVersion": 1,
+      "id": "cfc61d5a-feee-44e5-b2aa-824864bd5420",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "keys",
+        "keyPattern": "doc:idx:*",
+        "getValues": false
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        1296
+      ],
+      "id": "f451243b-ef2a-492c-861e-9132a42f4050",
+      "name": "Redis (Listar Index)",
+      "alwaysOutputData": true,
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Pega os nomes dos arquivos que estão no Drive agora\nconst driveFiles = $(\"Arquivos Deletados\").all().map(i => i.json.name);\n\n// 2. Pega a lista de chaves que o Redis retornou\nconst redisKeys = $(\"Redis (Listar Index)\").first().json.keys || [];\n\n// 3. Formata as chaves do Redis para comparação e extrai o nome\nconst redisIndices = redisKeys.map(key => {\n  return {\n    key: key,\n    fileName: key.replace(\"doc:idx:\", \"\")\n  }\n});\n\n// 4. Filtra quem está no Redis mas NÃO está mais no Drive\nconst orphans = redisIndices.filter(index => !driveFiles.includes(index.fileName));\n\nreturn orphans;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -272,
+        1296
+      ],
+      "id": "5aaae0f1-7e10-42f1-b429-13186a00ba11",
+      "name": "Padronizar Index",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $node[\"Padronizar Index\"].json.key }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        176,
+        1392
+      ],
+      "id": "62c553b3-d76b-4ad9-aa78-28eca8aa5e2d",
+      "name": "Redis (Delete Index)",
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $json.keyToDelete }}"
+      },
+      "id": "239b08e1-af0d-41a0-9da8-3618e022821a",
+      "name": "Redis (Delete Chunks)",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        400,
+        1200
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Padronizar Dados": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Redis (Get Index)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Possui Dados Antigos?": {
+      "main": [
+        [
+          {
+            "node": "Code (Prepare Delete)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code (Prepare Delete)": {
+      "main": [
+        [
+          {
+            "node": "Redis (Delete)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Ler Documento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ler Planilha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Redis Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Redis Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis (Pré-Scan)": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular Chaves Novas": {
+      "main": [
+        [
+          {
+            "node": "Redis (Salvar Índice)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis (Pós-Scan)": {
+      "main": [
+        [
+          {
+            "node": "Calcular Chaves Novas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis (Get Index)": {
+      "main": [
+        [
+          {
+            "node": "Possui Dados Antigos?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis (Delete)": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Ler Planilha": {
+      "main": [
+        [
+          {
+            "node": "Converter Linhas em Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ler Documento": {
+      "main": [
+        [
+          {
+            "node": "Redis Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converter Linhas em Texto": {
+      "main": [
+        [
+          {
+            "node": "Redis Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Arquivos Deletados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Arquivos Deletados": {
+      "main": [
+        [
+          {
+            "node": "Redis (Listar Index)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis (Listar Chunks)": {
+      "main": [
+        [
+          {
+            "node": "Padronizar Chunks",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Redis (Delete Index)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Padronizar Chunks": {
+      "main": [
+        [
+          {
+            "node": "Redis (Delete Chunks)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis (Salvar Índice)": {
+      "main": [
+        []
+      ]
+    },
+    "Google Drive (Criado)": {
+      "main": [
+        [
+          {
+            "node": "Padronizar Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive (Atualizado)": {
+      "main": [
+        [
+          {
+            "node": "Padronizar Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "Redis (Pós-Scan)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Redis (Pré-Scan)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis (Listar Index)": {
+      "main": [
+        [
+          {
+            "node": "Padronizar Index",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Padronizar Index": {
+      "main": [
+        [
+          {
+            "node": "Redis (Listar Chunks)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis (Delete Chunks)": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "42862612-c4d4-40d9-adf6-723a4df27e19",
+  "activeVersionId": null,
+  "versionCounter": 437,
+  "triggerCount": 3,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-22T04:20:33.910Z",
+      "createdAt": "2026-02-22T04:20:33.910Z",
+      "role": "workflow:owner",
+      "workflowId": "HN2ie4OR-IUIiYd5MX_dk",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": "Version 42862612",
+    "description": ""
+  }
+}

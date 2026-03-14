@@ -1,0 +1,463 @@
+{
+  "updatedAt": "2026-02-22T22:38:02.847Z",
+  "createdAt": "2026-02-15T17:40:08.315Z",
+  "id": "SU2wtQBdtGFD-Cu29VdTa",
+  "name": "supabase_crv",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4a9f63e8-e391-4099-8287-fccf0c3f29d5",
+              "name": "modifiedTime",
+              "value": "={{ new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        224
+      ],
+      "id": "cfb2d10a-305b-4ffd-8c2c-868bbc046ee8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "=modifiedTime > '{{ $json.modifiedTime }}'",
+        "returnAll": true,
+        "filter": {
+          "driveId": {
+            "__rl": true,
+            "value": "My Drive",
+            "mode": "list",
+            "cachedResultName": "My Drive",
+            "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "value": "1PjyM7IYa-5NnqSXCTljBNhUq_vfogOB5",
+            "mode": "list",
+            "cachedResultName": "CRV Imagem",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1PjyM7IYa-5NnqSXCTljBNhUq_vfogOB5"
+          }
+        },
+        "options": {
+          "fields": [
+            "id",
+            "name",
+            "mimeType"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        496,
+        224
+      ],
+      "id": "08cb8a25-5dc7-4c59-a7eb-8fca60f3531e",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        944,
+        224
+      ],
+      "id": "5af89b86-0cab-4c14-97eb-84795ce480c5",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1168,
+        224
+      ],
+      "id": "9c087f0b-c51d-453c-a273-589a951b892e",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8d00738c-bca1-4959-be84-3b298032f8d4",
+              "name": "file_name",
+              "value": "={{ $('Download file').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "98539c8c-c998-4a86-82c3-0f0b0a7bbb8b",
+              "name": "content",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "c13d4476-5941-4f72-9054-c006bb59c1d7",
+              "name": "metadata",
+              "value": "={{ $json.info.Producer }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1392,
+        224
+      ],
+      "id": "04d65284-bafd-45ce-8ddc-33b1a56eaa56",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d0bf1b69-9dc2-4b48-bf66-b5f497fbad8c",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": ".pdf",
+              "operator": {
+                "type": "string",
+                "operation": "endsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        720,
+        224
+      ],
+      "id": "b5421684-5b6a-49b9-88c7-8621f83c4554",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  // 1. Tenta pegar o texto do campo 'content' ou 'text'\n  let rawText = item.json.content || item.json.text || \"\";\n\n  // 2. Se o 'content' for um objeto (comum em leitores de PDF), tenta extrair a string\n  if (typeof rawText === 'object') {\n    rawText = JSON.stringify(rawText);\n  }\n\n  // 3. Limpeza profunda\n  let cleanedText = rawText\n    .replace(/[\\u0000-\\u001F\\u007F-\\u009F]/g, \"\") // Remove caracteres invisíveis\n    .replace(/\\s+/g, \" \")                         // Transforma qualquer sequência de espaços/quebras em um único espaço\n    .trim();                                      // Remove espaços nas extremidades\n\n  // 4. Retorno garantido\n  return {\n    json: {\n      ...item.json,\n      text_cleaned: cleanedText || \"ERRO: Nenhum texto encontrado no campo content\"\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        224
+      ],
+      "id": "792a40d2-eec7-4588-86ad-5060e663dad1",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "documentos"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        1872,
+        224
+      ],
+      "id": "c97798db-c2f3-4289-83e9-7692b0b93c5f",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        448
+      ],
+      "id": "df8fa3e6-8564-4e88-8607-3d77f1336d3b",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1968,
+        448
+      ],
+      "id": "340f3a72-fab3-480e-8534-fcbaed5b0f27",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        2048,
+        656
+      ],
+      "id": "7047ecda-507a-4f67-8c8a-239949507620",
+      "name": "Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        224
+      ],
+      "id": "cdbb200b-186b-497f-9786-87e27dc1bf5a",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "## Coletar dados\nEnviar pdf para a pasta CRV Imagem para extrair texto e inserir no banco de dados."
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "952f4495-1c52-4cd0-b316-205c998323ba",
+      "name": "Sticky Note1"
+    }
+  ],
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "e3a93659-76eb-4b1e-ad8b-57ab70718487",
+  "activeVersionId": null,
+  "versionCounter": 4,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-15T17:40:08.329Z",
+      "createdAt": "2026-02-15T17:40:08.329Z",
+      "role": "workflow:owner",
+      "workflowId": "SU2wtQBdtGFD-Cu29VdTa",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

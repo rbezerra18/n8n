@@ -1,0 +1,97 @@
+{
+  "updatedAt": "2026-02-22T17:02:35.000Z",
+  "createdAt": "2026-02-22T00:45:58.784Z",
+  "id": "-ehqnwZHZ_3IyQccTKQ_7",
+  "name": "My workflow",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "858f9458-c8b5-4ce7-a044-db59a179aac0",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "keys",
+        "keyPattern": "=doc:urso_conhecimento:*"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        208,
+        -16
+      ],
+      "id": "a5dfb098-2a24-4a3b-9ea3-6903fb18baac",
+      "name": "Redis1",
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "Redis1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "d62f56c3-173b-4353-a049-06b251b1ab8e",
+  "activeVersionId": null,
+  "versionCounter": 22,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-22T00:45:58.801Z",
+      "createdAt": "2026-02-22T00:45:58.801Z",
+      "role": "workflow:owner",
+      "workflowId": "-ehqnwZHZ_3IyQccTKQ_7",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

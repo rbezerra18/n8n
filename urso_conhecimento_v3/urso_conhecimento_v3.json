@@ -1,0 +1,625 @@
+{
+  "updatedAt": "2026-02-22T05:03:12.000Z",
+  "createdAt": "2026-02-22T04:07:46.196Z",
+  "id": "7PLIHBvTIC66M-xf571fB",
+  "name": "urso_conhecimento_v3",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1PjyM7IYa-5NnqSXCTljBNhUq_vfogOB5",
+          "mode": "list"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "a86448a3-fc96-4f71-976b-0f52aebc705c",
+      "name": "Google Drive Trigger (Criado/Atualizado)",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        96
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8553ff30-32bc-4e21-9e9f-9ed757a7d676",
+              "name": "fileName",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "e9d53dd5-e387-4387-8a68-cb5311854b69",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "33980d92-7366-4a76-b1c3-1eda6fe3077e",
+              "name": "mimeType",
+              "value": "={{ $json.mimeType }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -672,
+        96
+      ],
+      "id": "8626ce76-65c9-4a01-b1af-8278f5f9c55e",
+      "name": "Padronizar Dados"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "=idx:file:{{ $json.fileName }}",
+        "options": {}
+      },
+      "id": "f334a94c-6168-427e-af1d-8568eb843d2c",
+      "name": "Redis (Get Index)",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        96
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "check_index",
+              "leftValue": "={{ $json.propertyName }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "cabc0a57-0459-42f7-bc1c-e8625e5c3193",
+      "name": "Possui Dados Antigos?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -224,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Converte a string de IDs (ID1,ID2,...) em comandos Redis DEL\nconst idsString = $json.value;\nconst ids = idsString.split(',');\nreturn { \n  command: 'DEL',\n  args: ids\n};"
+      },
+      "id": "da29f08c-ec51-4d54-a1ae-8f6ef4a2e821",
+      "name": "Code (Prepare Delete)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        24
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "custom"
+      },
+      "id": "68ffca6d-a6dd-4a3f-b824-abb65d3eba43",
+      "name": "Redis (Batch Delete)",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        224,
+        24
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Padronizar Dados').item.json.mimeType }}",
+                    "rightValue": "document",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "ce3d3673-9933-4d1f-a803-5aaa93ce5d3e"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ca8095bf-0d83-419b-9d3a-1071cafde71a",
+                    "leftValue": "={{ $('Padronizar Dados').item.json.mimeType }}",
+                    "rightValue": "spreadsheet",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        96
+      ],
+      "id": "ccbe2cfa-e774-4d2a-8121-a7defdf5f868",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('Padronizar Dados').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        896,
+        0
+      ],
+      "id": "1d4ee3d1-fa82-489e-b489-0b82a3983b68",
+      "name": "Get a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Padronizar Dados').item.json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Dados",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        192
+      ],
+      "id": "e744c642-89a0-4d9d-8111-e7d66bda9a72",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Formatação robusta para GSheets\nconst fileName = $(\"Padronizar Dados\").first().json.fileName;\nconst type = $(\"Padronizar Dados\").first().json.mimeType;\n\nreturn $input.all().map(item => {\n  const rowText = Object.keys(item.json)\n    .map(key => `${key}: ${item.json[key] || ''}`)\n    .join(' | ');\n  return {\n    json: {\n      content: rowText,\n      source: fileName,\n      tipo: type\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        192
+      ],
+      "id": "7bdf2681-6e8a-4eb6-8378-2203330dd4a3",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "redisIndex": {
+          "__rl": true,
+          "value": "urso_conhecimento",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreRedis",
+      "typeVersion": 1.3,
+      "position": [
+        1152,
+        96
+      ],
+      "id": "f88cfc23-1332-4323-96aa-f437451d3c66",
+      "name": "Redis Vector Store",
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        320
+      ],
+      "id": "e699f2c3-6d51-4d0e-af2c-4c79fce436a3",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "source",
+                "value": "={{ $json.source }}"
+              },
+              {
+                "name": "tipo",
+                "value": "={{ $json.tipo }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1248,
+        320
+      ],
+      "id": "cf8d685a-8865-4648-9b5a-f33ceccb5838",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {
+          "splitCode": "markdown"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        528
+      ],
+      "id": "41096f98-9280-44d4-b0e9-1524eb9cae5d",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "jsCode": "/*\nCaptura os IDs gerados pelo Vector Store.\nNo n8n-langchain, o output costuma vir como documentos.\nPrecisamos salvar o mapping para limpeza futura.\n*/\nconst items = $input.all();\nconst fileName = $(\"Padronizar Dados\").first().json.fileName;\n\n// Nota: O nó do Redis Vector Store no n8n retorna os documentos processados.\n// Vamos extrair as chaves que foram criadas no Redis.\nconst redisKeys = items.map(item => item.json.metadata.id || item.json.id).filter(id => id);\n\nreturn {\n  fileName: fileName,\n  ids: redisKeys.join(',')\n};"
+      },
+      "id": "a1b0b82d-2b84-4266-ba4c-8ba624c9d26c",
+      "name": "Code (Collect IDs)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=idx:file:{{ $json.fileName }}",
+        "value": "={{ $json.ids }}"
+      },
+      "id": "04a831de-27f0-4bff-8714-53748b75184b",
+      "name": "Redis (Save Index)",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        96
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Google Drive Trigger (Criado/Atualizado)": {
+      "main": [
+        [
+          {
+            "node": "Padronizar Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Padronizar Dados": {
+      "main": [
+        [
+          {
+            "node": "Redis (Get Index)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis (Get Index)": {
+      "main": [
+        [
+          {
+            "node": "Possui Dados Antigos?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Possui Dados Antigos?": {
+      "main": [
+        [
+          {
+            "node": "Code (Prepare Delete)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code (Prepare Delete)": {
+      "main": [
+        [
+          {
+            "node": "Redis (Batch Delete)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis (Batch Delete)": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get a document",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Redis Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a document": {
+      "main": [
+        [
+          {
+            "node": "Redis Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Redis Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Redis Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Code (Collect IDs)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code (Collect IDs)": {
+      "main": [
+        [
+          {
+            "node": "Redis (Save Index)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "ae7fed7e-1063-4ff8-813f-18eaa47f9c3f",
+  "activeVersionId": null,
+  "versionCounter": 7,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-22T04:07:46.233Z",
+      "createdAt": "2026-02-22T04:07:46.233Z",
+      "role": "workflow:owner",
+      "workflowId": "7PLIHBvTIC66M-xf571fB",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

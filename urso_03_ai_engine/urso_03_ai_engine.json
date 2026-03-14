@@ -1,0 +1,179 @@
+{
+  "updatedAt": "2026-02-21T22:24:18.000Z",
+  "createdAt": "2026-02-19T21:25:38.270Z",
+  "id": "0aTw8zRabYPe36ERhesmf",
+  "name": "URSO - 03 AI Engine",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "range"
+      },
+      "id": "5a511df3-ce47-4d37-8890-0c0d825f92d2",
+      "name": "Read Buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const msgs = $json.data.reverse();\nreturn [{prompt: msgs.join('\\n'), session: $json.session}];"
+      },
+      "id": "6173a3f1-3ab4-4d65-afc8-761529bbbab8",
+      "name": "Build Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "d5c5cbc5-13b1-4f56-a7f9-38535f433d39",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [
+        448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "=buffer:{{$json.session}}"
+      },
+      "id": "cf296275-f138-411a-804d-fae9fa69404b",
+      "name": "Cleanup Buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        736,
+        0
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        304,
+        208
+      ],
+      "id": "35782f61-c60e-40a7-822f-3a4e55a19a6b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Read Buffer": {
+      "main": [
+        [
+          {
+            "node": "Build Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Prompt": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Cleanup Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1b07e921-c47c-4772-81ae-0934dcc36fe8",
+  "activeVersionId": null,
+  "versionCounter": 6,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-19T21:25:38.363Z",
+      "createdAt": "2026-02-19T21:25:38.363Z",
+      "role": "workflow:owner",
+      "workflowId": "0aTw8zRabYPe36ERhesmf",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

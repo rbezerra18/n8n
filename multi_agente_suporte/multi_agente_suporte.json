@@ -1,0 +1,188 @@
+{
+  "updatedAt": "2026-02-24T04:09:16.236Z",
+  "createdAt": "2026-02-24T03:48:08.025Z",
+  "id": "s9uNIQDg5o5u3dJe",
+  "name": "multi-agente Suporte",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "text"
+            },
+            {
+              "name": "threadID"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "eb55f34a-7735-4dcb-aaaf-e35ff9925c82",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        224
+      ],
+      "id": "ef6b1e91-4fd1-4fdb-b6b3-1cf0b65a21fc",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.threadID }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        224
+      ],
+      "id": "6f650c22-f9f7-44e1-867e-a709773c40ad",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=IDENTIDADE\nVocê é um especialista de suporte técnico da Hash Computadores.\nSeu objetivo é diagnosticar problemas e orientar soluções de forma simples, segura e passo a passo.\n\nCOMPORTAMENTO\n- Explique sempre em linguagem acessível.\n- Seja paciente, claro e objetivo.\n- Adapte o nível técnico ao conhecimento do cliente.\n- Priorize instruções práticas e sequenciais.\n- Use analogias simples quando ajudar a compreensão.\n\nESCOPO DE SUPORTE\nAjude com:\n- Lentidão, travamentos e desempenho\n- Windows, drivers e atualizações\n- Problemas de hardware básico (tela, teclado, bateria, Wi-Fi)\n- Configuração inicial e boas práticas de uso\n\nLIMITES\n- Não informar preços, pagamentos ou condições comerciais.\n- Não inventar soluções.\n- Não realizar acesso remoto.\n- Não compartilhar links externos sem autorização.\n- Se for assunto comercial → encaminhar ao time comercial.\n\nMÉTODO DE ATENDIMENTO\n1. Entenda o problema antes de sugerir solução.\n2. Confirme sintomas principais.\n3. Oriente passo a passo.\n4. Após a solução, confirme se funcionou.\n5. Finalize com dica preventiva e despedida cordial.\n\nREFERÊNCIA DE MODELOS HASH\nUse apenas se relevante ao problema:\n\nOffice 200X → uso básico, possíveis travamentos por longas sessões.\nProBook Z5 → multitarefa e apps profissionais.\nGamer Neo R7 → jogos, GPU e temperatura.\n\nENCERRAMENTO\nSempre finalize confirmando entendimento e oferecendo ajuda futura.\n\nAntes de responder, consulte as ferramentas disponíveis se precisar de informações técnicas.\nNunca assuma dados técnicos sem verificar."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        280,
+        0
+      ],
+      "id": "0d5de969-2daf-4757-a448-c756ee50ca45",
+      "name": "AI Suporte"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  modelos: {\n    office200x: {\n      uso: \"tarefas leves\",\n      problemas: [\"lentidão após longas sessões\", \"wifi instável\"]\n    },\n    probookZ5: {\n      uso: \"multitarefas\",\n      problemas: [\"alto uso de CPU\", \"apps pesados\"]\n    },\n    gamerR7: {\n      uso: \"jogos\",\n      problemas: [\"FPS baixo\", \"superaquecimento\"]\n    }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        224
+      ],
+      "id": "d64f9730-236e-42d1-b2d7-127fd659919c",
+      "name": "modelos"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Suporte",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Suporte",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Suporte",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "modelos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Suporte",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ff2acf1a-8b32-46f3-b2e4-fa863d781557",
+  "activeVersionId": null,
+  "versionCounter": 10,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-24T03:48:08.097Z",
+      "createdAt": "2026-02-24T03:48:08.097Z",
+      "role": "workflow:owner",
+      "workflowId": "s9uNIQDg5o5u3dJe",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

@@ -1,0 +1,343 @@
+{
+  "updatedAt": "2026-03-07T21:43:05.000Z",
+  "createdAt": "2026-03-05T20:37:27.478Z",
+  "id": "2Tzh8btb3ryneN5T",
+  "name": "urso_testeenviobd",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2070d274-d54d-4163-85eb-b24e1aea4a2c",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=Você é um agente especializado em responder dúvidas relacionadas ao POP (Procedimento Operacional Padrão) e às Mensagens Rápidas sobre orçamentos e preparos dos exames do CRV Imagem.\n\nObjetivo:\nFornecer respostas claras, objetivas e fiéis aos procedimentos oficiais da empresa.\n\nRegras de funcionamento:\n- SEMPRE consulte as ferramentas \"POP\" e \"Mensagens\" antes de responder qualquer pergunta.\n- Utilize exclusivamente as informações recuperadas das ferramentas como fonte principal.\n- Caso a informação não seja encontrada, informe que o conteúdo não está disponível na sua base de conhecimento e solicite mais detalhes ao usuário.\n- Não invente procedimentos, regras ou instruções.\n- Responda de forma profissional, direta e fácil de entender.\n- Priorize respostas curtas, mas completas.\n\nFormato da resposta:\n- Linguagem profissional e cordial.\n- Explicação prática e orientada à ação quando aplicável."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        384,
+        0
+      ],
+      "id": "a69c4e3b-247e-48bb-b522-4aaebf087a57",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        224
+      ],
+      "id": "f233def5-aa13-4363-8d97-2550ed6071db",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.threadId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        224
+      ],
+      "id": "2fa6b7d8-88db-420c-8451-7f3e6a0ebb32",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        432
+      ],
+      "id": "ed61fe2a-06a6-43b3-8922-45fb04bc0b86",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "reply",
+        "threadId": "={{ $('Gmail Trigger').item.json.threadId }}",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1136,
+        0
+      ],
+      "id": "d59377c3-c130-46c2-8e88-e054eb3f468e",
+      "name": "Reply to a message",
+      "webhookId": "e111e5c6-128e-4220-9d67-853cbcefb048",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Use esta ferramenta para consultar o conteúdo oficial do POP (Procedimento Operacional Padrão).\n\nQuando utilizar:\n- Sempre que precisar responder dúvidas ou solicitações relacionados a processos, regras, rotinas ou instruções operacionais da empresa.\n\nComo utilizar:\n- Busque informações relevantes à pergunta do usuário.\n- Recupere apenas os trechos mais relacionados ao contexto da solicitação.\n- Utilize o conteúdo encontrado como base principal da resposta.\n\nImportante:\n- Esta é a fonte oficial de procedimentos.\n- Não invente informações caso nenhum resultado relevante seja encontrado.",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "urso-conhecimento",
+          "mode": "list",
+          "cachedResultName": "urso-conhecimento"
+        },
+        "options": {
+          "pineconeNamespace": "popcrvimagempdf"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        224
+      ],
+      "id": "00998955-f3ec-4dfd-93d4-9b3dffbea2f6",
+      "name": "POP",
+      "credentials": {
+        "pineconeApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        848,
+        432
+      ],
+      "id": "7ba6d2f6-6904-4c4f-9f8f-37c4fb682ba6",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Use esta ferramenta para consultar o conteúdo oficial das Mensagens Rápidas sobre orçamentos e preparos de exames.\n\nQuando utilizar:\n- Sempre que precisar responder dúvidas ou solicitações relacionados a processos, regras, rotinas ou instruções operacionais da empresa.\n\nComo utilizar:\n- Busque informações relevantes à pergunta do usuário.\n- Recupere apenas os trechos mais relacionados ao contexto da solicitação.\n- Utilize o conteúdo encontrado como base principal da resposta.\n\nImportante:\n- Esta é a fonte oficial de procedimentos.\n- Não invente informações caso nenhum resultado relevante seja encontrado.",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "urso-conhecimento",
+          "mode": "list",
+          "cachedResultName": "urso-conhecimento"
+        },
+        "options": {
+          "pineconeNamespace": "mensagensrapidascrvimagempdf"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        768,
+        224
+      ],
+      "id": "8fdc25df-cee2-4218-9ec1-0f00318d8477",
+      "name": "Mensagens",
+      "credentials": {
+        "pineconeApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "POP",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POP": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Mensagens",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagens": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "96902737-70b3-471e-81cd-494d7800677c",
+  "activeVersionId": null,
+  "versionCounter": 3,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-03-05T20:37:27.482Z",
+      "createdAt": "2026-03-05T20:37:27.482Z",
+      "role": "workflow:owner",
+      "workflowId": "2Tzh8btb3ryneN5T",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

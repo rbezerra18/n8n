@@ -1,0 +1,267 @@
+{
+  "updatedAt": "2026-02-22T05:03:08.000Z",
+  "createdAt": "2026-02-22T00:52:46.761Z",
+  "id": "FIuMte63cXxCoTpQG4Lwb",
+  "name": "urso_conhecimento_atualizado",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1PjyM7IYa-5NnqSXCTljBNhUq_vfogOB5",
+          "mode": "list",
+          "cachedResultName": "CRV Imagem",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1PjyM7IYa-5NnqSXCTljBNhUq_vfogOB5"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "a23c90ac-8958-4689-8653-38504feeed60",
+      "name": "Google Drive Trigger (Criado)",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1PjyM7IYa-5NnqSXCTljBNhUq_vfogOB5",
+          "mode": "list",
+          "cachedResultName": "CRV Imagem",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1PjyM7IYa-5NnqSXCTljBNhUq_vfogOB5"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "id": "e3ba307c-59d2-4599-bd5d-dbc34bb76c82",
+      "name": "Google Drive Trigger (Atualizado)",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        208
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "=doc:urso_conhecimento:*"
+      },
+      "id": "cff80cc2-46a8-4c35-a2c9-931925e7bd80",
+      "name": "Buscar IDs Antigos",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        256,
+        112
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.all();\nif (results.length <= 1) return []; // Primeiro item é a contagem\n\nconst ids = results.slice(1).map(item => item.json.id || item.json.key);\nreturn { ids: ids.join(' ') };"
+      },
+      "id": "44277c43-40c6-4598-81da-7ae41758186f",
+      "name": "Extrair IDs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeCustomCommand"
+      },
+      "id": "a03aeae7-c880-4a9c-a5bc-25a2603a2e74",
+      "name": "Deletar Vetores Antigos",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        656,
+        112
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $node[\"Google Drive Trigger (Criado)\"].json.mimeType || $node[\"Google Drive Trigger (Atualizado)\"].json.mimeType }}",
+                    "rightValue": "document",
+                    "operator": "contains"
+                  }
+                ]
+              }
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $node[\"Google Drive Trigger (Criado)\"].json.mimeType || $node[\"Google Drive Trigger (Atualizado)\"].json.mimeType }}",
+                    "rightValue": "spreadsheet",
+                    "operator": "contains"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "671f3be7-b7ad-489c-b4b3-a55a9b655234",
+      "name": "Switch Tipo",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        864,
+        112
+      ]
+    }
+  ],
+  "connections": {
+    "Google Drive Trigger (Criado)": {
+      "main": [
+        [
+          {
+            "node": "Buscar IDs Antigos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger (Atualizado)": {
+      "main": [
+        [
+          {
+            "node": "Buscar IDs Antigos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar IDs Antigos": {
+      "main": [
+        [
+          {
+            "node": "Extrair IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair IDs": {
+      "main": [
+        [
+          {
+            "node": "Deletar Vetores Antigos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deletar Vetores Antigos": {
+      "main": [
+        [
+          {
+            "node": "Switch Tipo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "9263c55f-6f67-4c56-bf27-eb99667d9e70",
+  "activeVersionId": null,
+  "versionCounter": 20,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-22T00:52:46.815Z",
+      "createdAt": "2026-02-22T00:52:46.815Z",
+      "role": "workflow:owner",
+      "workflowId": "FIuMte63cXxCoTpQG4Lwb",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

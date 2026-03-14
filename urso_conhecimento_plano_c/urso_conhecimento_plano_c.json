@@ -1,0 +1,362 @@
+{
+  "updatedAt": "2026-02-22T05:03:03.000Z",
+  "createdAt": "2026-02-22T02:35:59.451Z",
+  "id": "YAsirhqKMGwC-dI4jVFOP",
+  "name": "urso_conhecimento_plano_c",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1PjyM7IYa-5NnqSXCTljBNhUq_vfogOB5",
+          "mode": "list",
+          "cachedResultName": "CRV Imagem",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1PjyM7IYa-5NnqSXCTljBNhUq_vfogOB5"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "ed58b8ea-9cbf-4190-92cd-47c8d01b7ef8",
+      "name": "Google Drive Trigger (Criado)",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1PjyM7IYa-5NnqSXCTljBNhUq_vfogOB5",
+          "mode": "list",
+          "cachedResultName": "CRV Imagem",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1PjyM7IYa-5NnqSXCTljBNhUq_vfogOB5"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "id": "1f61fa9a-baf8-4659-9dd6-4ca16fd6f2f3",
+      "name": "Google Drive Trigger (Atualizado)",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "keys",
+        "keyPattern": "doc:urso_conhecimento:*",
+        "getValues": false
+      },
+      "id": "8fdd8eea-5300-4b1f-b5e6-d903dbf68305",
+      "name": "Redis (Listar Todas Chaves)",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        448,
+        96
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "={{ $json.key }}",
+        "options": {}
+      },
+      "id": "6dada683-e5b8-4483-9c0a-8c50d9b673c2",
+      "name": "Redis (Ler Conteúdo)",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        896,
+        96
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.propertyName.content }}",
+              "value2": "={{ $('Edit Fields').item.json.fileName }}"
+            }
+          ]
+        }
+      },
+      "id": "5151f668-26b8-445b-8abe-06304d273107",
+      "name": "Filtro (Mesmo Arquivo)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $node[\"Redis (Ler Conteúdo)\"].json.key }}"
+      },
+      "id": "c63f3f5e-f9e6-44d1-ace5-1204a16c67cb",
+      "name": "Redis (Deletar Antigos)",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        24
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $node[\"Google Drive Trigger (Criado)\"].json.mimeType || $node[\"Google Drive Trigger (Atualizado)\"].json.mimeType }}",
+                    "rightValue": "document",
+                    "operator": "contains"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "23c0f469-64cb-4320-9498-35c841de44d2",
+      "name": "Switch Ingestão",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        1568,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega a lista de chaves e transforma em itens individuais para o n8n\nreturn $input.first().json.keys.map(key => ({ json: { key: key } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        96
+      ],
+      "id": "b0dc5c37-e86c-48ea-932f-a43eb79987fb",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8553ff30-32bc-4e21-9e9f-9ed757a7d676",
+              "name": "fileName",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        96
+      ],
+      "id": "d2a961af-f606-494d-b6c2-6df6730320ba",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "Google Drive Trigger (Criado)": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger (Atualizado)": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis (Listar Todas Chaves)": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis (Ler Conteúdo)": {
+      "main": [
+        [
+          {
+            "node": "Filtro (Mesmo Arquivo)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro (Mesmo Arquivo)": {
+      "main": [
+        [
+          {
+            "node": "Redis (Deletar Antigos)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch Ingestão",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis (Deletar Antigos)": {
+      "main": [
+        [
+          {
+            "node": "Switch Ingestão",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Redis (Ler Conteúdo)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Redis (Listar Todas Chaves)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "2c026608-ce00-457c-a41e-3f7757ccd49f",
+  "activeVersionId": null,
+  "versionCounter": 60,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-22T02:35:59.470Z",
+      "createdAt": "2026-02-22T02:35:59.470Z",
+      "role": "workflow:owner",
+      "workflowId": "YAsirhqKMGwC-dI4jVFOP",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

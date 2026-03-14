@@ -1,0 +1,160 @@
+{
+  "updatedAt": "2026-02-19T21:20:09.000Z",
+  "createdAt": "2026-02-19T21:04:21.632Z",
+  "id": "14pKNHaVtoBdKCyyzcni9",
+  "name": "URSO - Message Buffer (Slack -> Redis)",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "id": "901a49ba-f3d8-4ce8-bb34-7fdf7c807418",
+      "name": "Slack Trigger",
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "dcb39582-4a77-41db-bf18-36ccbc5c74b3",
+      "credentials": {
+        "slackApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const channel = $json.event.channel;\nconst user = $json.event.user;\nconst thread = $json.event.thread_ts || $json.event.ts;\n\nreturn [{\n  redisKey: `chatbuffer:${channel}:${thread}:${user}`,\n  text: $json.event.text,\n  channel,\n  thread\n}];"
+      },
+      "id": "21dad479-293d-4b0f-b8d3-6c37b14bc34f",
+      "name": "Build Redis Key",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "push"
+      },
+      "id": "3fa62c8e-78ea-43f0-ac99-848073725fbc",
+      "name": "Redis LPUSH",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        448,
+        0
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "expire"
+      },
+      "id": "58f70dae-1db8-4b59-8b58-82054f5049ba",
+      "name": "Reset TTL (Debounce)",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        672,
+        0
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Redis Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Redis Key": {
+      "main": [
+        [
+          {
+            "node": "Redis LPUSH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis LPUSH": {
+      "main": [
+        [
+          {
+            "node": "Reset TTL (Debounce)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "c6c36740-1e77-4553-bcf1-9a0b8299087b",
+  "activeVersionId": null,
+  "versionCounter": 4,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-19T21:04:21.650Z",
+      "createdAt": "2026-02-19T21:04:21.650Z",
+      "role": "workflow:owner",
+      "workflowId": "14pKNHaVtoBdKCyyzcni9",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

@@ -1,0 +1,407 @@
+{
+  "updatedAt": "2026-02-21T22:24:16.000Z",
+  "createdAt": "2026-02-19T21:22:42.690Z",
+  "id": "5-ZeRj6rbzAoCbtIPWQY4",
+  "name": "URSO - 01 Intake",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "trigger": [
+          "any_event"
+        ],
+        "watchWorkspace": true,
+        "options": {}
+      },
+      "id": "34cd2852-696a-41c7-bce8-6079c70ff6bf",
+      "name": "Slack Trigger",
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        112
+      ],
+      "webhookId": "deeb2314-5de1-45e0-a569-3dbb19855e90",
+      "credentials": {
+        "slackApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const channel = $json.event.channel;\nconst thread = $json.event.thread_ts || $json.event.ts;\nreturn [{\n  session: `${channel}:${thread}`,\n  text: $json.event.text,\n  user: $json.event.user,\n  channel,\n  thread\n}];"
+      },
+      "id": "657a2905-94da-4799-ada2-7d0c5107df07",
+      "name": "Build Session",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=cancel:{{$json.session}}",
+        "value": "1",
+        "expire": true,
+        "ttl": 30
+      },
+      "id": "38d098c5-c55b-4dc1-a4a1-5f70ec471959",
+      "name": "Cancel Active Response",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "push"
+      },
+      "id": "c2cb9222-f3d6-4a67-b629-ed489ca0c420",
+      "name": "Push Buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "expire"
+      },
+      "id": "3436a759-5b19-434a-b631-d2600d7c67c2",
+      "name": "Reset Debounce TTL",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        224,
+        192
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "range"
+      },
+      "id": "54860205-c8d5-430a-afac-73f065752990",
+      "name": "Read Buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        608
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const msgs = $json.data.reverse();\nreturn [{prompt: msgs.join('\\n'), session: $json.session}];"
+      },
+      "id": "d93a2316-8301-409e-8e34-52899ee55f83",
+      "name": "Build Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "92f4a7c8-fdec-43ae-83a5-505c43badc27",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [
+        0,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "=buffer:{{$json.session}}"
+      },
+      "id": "cda95229-4d46-4f4b-865c-76ae170f55e5",
+      "name": "Cleanup Buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        288,
+        608
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        0,
+        800
+      ],
+      "id": "0c99e873-02f5-44dc-bdd1-7200561270f1",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        }
+      },
+      "id": "84c9bbb6-a68e-47ca-8e26-cc49da3fd9f8",
+      "name": "Worker Tick",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "keys"
+      },
+      "id": "c7b9b383-ab0b-4723-985a-7a4675db85fa",
+      "name": "Find Buffers",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        400
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(i => ({ session: i.json.key.replace('buffer:', '') }));"
+      },
+      "id": "2c54f16c-5085-4074-9692-a2995d4a0f5e",
+      "name": "Extract Session",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "1ff0b197-e364-447a-bc25-caa215a896c3",
+      "name": "Call AI Engine",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        224,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Session": {
+      "main": [
+        [
+          {
+            "node": "Cancel Active Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push Buffer": {
+      "main": [
+        [
+          {
+            "node": "Reset Debounce TTL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Buffer": {
+      "main": [
+        [
+          {
+            "node": "Build Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Prompt": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Cleanup Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Worker Tick": {
+      "main": [
+        [
+          {
+            "node": "Find Buffers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Buffers": {
+      "main": [
+        [
+          {
+            "node": "Extract Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Session": {
+      "main": [
+        [
+          {
+            "node": "Call AI Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "977e2742-1fdb-4681-b86e-16c9b19313b6",
+  "activeVersionId": null,
+  "versionCounter": 12,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-19T21:22:42.726Z",
+      "createdAt": "2026-02-19T21:22:42.726Z",
+      "role": "workflow:owner",
+      "workflowId": "5-ZeRj6rbzAoCbtIPWQY4",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

@@ -1,0 +1,345 @@
+{
+  "updatedAt": "2026-02-23T02:24:52.951Z",
+  "createdAt": "2026-02-22T22:42:42.002Z",
+  "id": "gW8MqFblsiLbBmxwYCw9Z",
+  "name": "IA Agendamento - Roberto",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        784,
+        800
+      ],
+      "id": "8677df9a-2d20-4476-879a-88af9037234e",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        576
+      ],
+      "id": "279fdc08-c2e0-4292-b61f-6e3fd90c176e",
+      "name": "Telegram Trigger",
+      "webhookId": "c8d224a2-e3b3-4aed-81da-d3f63bc4e4f5",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const instrucoesAgente = `\nVocê é um secretário e é responsável por agendar novas reuniões via chat de pessoais interessadas em falar com Roberto Bezerra (Robertinho). Siga exatamente as instruções abaixo para evitar erros no agendamento:\n\nPara agendar uma consulta, só prossiga quando o cliente digitar:\n- Nome completo\n- E-mail válido\n- Data e horário desejado\nVocê pode conversar normalmente antes, mas só crie ou altere a reunião quando tiver essas 3 informações.\n\nCaso a pessoa informe uma data que caia no fim de semana (sábado ou domingo) ou em feriado, recuse o agendamento. Use seu conhecimento de calendário para reconhecer automaticamente se uma data como \"21 de fevereiro de 2026\" é um sábado e uma data como “22 de fevereiro de 2026” é um domingo.\n\nLista de Feriados\nData\tDescrição\n01/01/2026\tConfraternização Universal\n20/01/2026\tSão Sebastião\n17/02/2026\tCarnaval\n03/04/2026\tSexta-feira Santa\n21/04/2026\tTiradentes\n23/04/2026\tSão Jorge\n01/05/2026\tDia do Trabalho\n04/06/2026\tCorpus Christi\n07/09/2026\tIndependência do Brasil\n12/10/2026\tN. S. Aparecida\n02/11/2026\tFinados\n15/11/2026\tProclamação República\n20/11/2026\tConsciência Negra\n25/12/2026\tNatal\n\n**Nunca aceite agendamentos aos sábados, aos domingos e em feriados.**\n\nSe o cliente informar uma data que seja sábado, domingo ou feriado, diga:\n\"Infelizmente, agendamentos não podem ser realizados aos finais de semana ou em feriados. Por favor, escolha um dia útil (segunda a sexta-feira).\"\n\nDia atual: {{ $now.toLocaleString(\"pt-BR\", { timeZone: \"America/Sao_Paulo\" }) }}\n\n- Siga o padrão brasileiro de data e hora (DD/MM/AAAA e HH). Hora atual: {{ $now }}\nRegras:\n\nQuando a pessoa informar uma data como \"dia 28 às 12h\", você deve sempre perguntar o mês e ano antes de executar a ação que o usuário deseja.\n\nQuando a pessoa informar um horário como “05h da tarde”, entender a hora do agendamento sempre com horário padrão 24h, ou seja, 17h.\n\nVocê deve converter isso para o formato ISO completo:  \n**AAAA-MM-DDTHH:mm:ss-03:00**  \nPor exemplo: \"2026-04-28T12:00:00-03:00\"\n\nNunca crie datas usando apenas texto ou números soltos. Sempre use o formato ISO completo e preciso antes de criar a reunião no calendário.\n\nNunca agende reuniões com datas anteriores a data de hoje (retroativas).\n\nNunca altere ou delete reuniões já realizadas.\n\nHorários disponíveis para agendar reuniões:\nAgende reuniões apenas nos seguintes horários abaixo. \nSegunda-feira: 9:00 as 18:00\nTerça-feira:  9:00 as 18:00\nQuarta-feira:  9:00 as 18:00\nQuinta-feira:  9:00 as 18:00\nSexta-feira:  9:00 as 18:00\nTodas as consultas agendadas serão de 1h de duração e é totalmente proibido agendar consultas nos sábados, domingos e feriados, nunca faça isso.\n\nVocê não deve enviar o link criado pelo Google Calendar para o usuário, mas sempre envie o convite para o e-mail informado por ele e faça o agendamento no seu Google Calendar. \n\nRestrição de horário\nNunca marque mais de uma reunião na mesma hora, utilize a ferramenta \"Consultar\" para ver se aquele horário informado está disponível. Por exemplo, se o usuário escolher o horário de 16h e já tenha uma reunião nessa hora, não confirme a reunião. Mas caso ele escolha 17h, você pode marcar a reunião. Caso ainda exista algum conflito, pergunte para o usuário se ele não quer marcar uma reunião no próximo horário disponível.\n\nCriar agendamento\n- Utilize a tool \"Agendar\" create:event sempre que o usuário falar em \"agendar\", \"agenda\", \"lembrar\", \"ligar\", \"conversar\", \"mandar\", “marcar”, “reunir”, “reunião”, ”evento”.\n- Crie um evento no Calendário do Google na data e hora solicitada pelo usuário.\n\n\nConsultar agendamento\n- Utilize a tool \"Consultar\" getall:event sempre que for solicitado para saber os agendamentos feitos.\nSempre que for fazer um novo agendamento confira as datas e horários nessa tool também.\n- Só retorne para o usuário os agendamentos que estão no Google Calendar, não utilize supostos agendamento de memória, pois o usuário pode ter entrado no Google Calendar e removido o agendamento manualmente.\n\nDeletar agendamento\n- Utilize a tool \"Deletar\" delete:event sempre que o usuário pedir para \"deletar\", \"excluir\", \"apagar\", “desmarcar” um determinado evento.\n- Utilize a tool \"Consultar\" getall:event para achar o evento em questão para ser deletado.\n\nAtualizar agendamento\n- Sempre que for solicitado para \"atualizar\", \"alterar\", \"mudar\", “remarcar” um determinado evento, utilize a tool \"Consultar\" getall:event para achar o evento em questão para ser alterado, depois utilize a tool \"Deletar\" delete:event para deletar o evento e por último utilize a tool de \"Agendar\" create:event para criar um novo evento.\n\nPara todas as respostas que envolvam agendamento, alteração ou exclusão de reunião, responder nesse padrão, substituindo os campos abaixo pelos campos corretos:\n\"Sua reunião foi agendada/alterada/excluída com sucesso!\n- Data: DD de mês de AAAA (dia da semana)\n- Horário: HHhMM às HHhMM (horário de Brasília)\n- Assunto: Assunto\n- Participante: e-mail@provedor.com.br\n\nVocê poderá acessar a reunião aqui: https://www.google.com/calendar/event?eiddG92aWRhbjZobWphcmxtbjRlcmtjM3JxZ2sgcmJlemVycmExOEBt.\"\n`;\n\nreturn {\n  instrucoes: instrucoesAgente,\n  mensagemOriginal: $json.message?.text || ''\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        560,
+        576
+      ],
+      "id": "b494ab27-4a36-4eb2-be0c-c09fc1b758dc",
+      "name": "Code Contexto"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        912,
+        800
+      ],
+      "id": "756312b7-0b99-4d15-9846-05cd89ce3701",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "rbezerra18@gmail.com",
+          "mode": "list",
+          "cachedResultName": "rbezerra18@hotmail.com"
+        },
+        "start": "={{ $fromAI('start') }}",
+        "end": "={{ $fromAI('end') }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ $fromAI('attendee') }}"
+          ],
+          "sendUpdates": "all",
+          "summary": "={{ $fromAI('summary') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        800
+      ],
+      "id": "f46b65d6-40cc-420c-9d2a-480cf2686e5f",
+      "name": "Agendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "rbezerra18@gmail.com",
+          "mode": "list",
+          "cachedResultName": "rbezerra18@hotmail.com"
+        },
+        "returnAll": true,
+        "timeMax": "={{ $now.plus({ week: 8 }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1168,
+        800
+      ],
+      "id": "6f57a8c0-ad62-452b-a5d2-3431fd45d5a5",
+      "name": "Consultar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "rbezerra18@gmail.com",
+          "mode": "list",
+          "cachedResultName": "rbezerra18@hotmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', `Delete a reunião solicitada.`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1296,
+        800
+      ],
+      "id": "db961b0a-8f26-419a-96c2-e15ef1240fca",
+      "name": "Deletar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output ? $json.output.toString().replace(/[*_`[\\]()~>#+=|{}<>!]/g, '').replace(/[\\n\\r]/g, ' ') : 'Mensagem inválida.' }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1504,
+        576
+      ],
+      "id": "c978e2de-ee8f-4113-a5b5-958b7b6f16f8",
+      "name": "Send a text message",
+      "webhookId": "c2fa3148-2719-4087-a249-c4a5be88d012",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.mensagemOriginal }}",
+        "options": {
+          "systemMessage": "={{ $json.instrucoes }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        968,
+        576
+      ],
+      "id": "75b7efa5-daf7-40e7-972e-500221b2842a",
+      "name": "AI Agent"
+    }
+  ],
+  "connections": {
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code Contexto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Contexto": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deletar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ff4b3386-05df-4ae3-b13a-890bfbdf12c1",
+  "activeVersionId": null,
+  "versionCounter": 222,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-22T22:42:42.026Z",
+      "createdAt": "2026-02-22T22:42:42.026Z",
+      "role": "workflow:owner",
+      "workflowId": "gW8MqFblsiLbBmxwYCw9Z",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": "Version ff4b3386",
+    "description": ""
+  }
+}

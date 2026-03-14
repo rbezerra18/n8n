@@ -1,0 +1,421 @@
+{
+  "updatedAt": "2026-03-13T02:59:21.693Z",
+  "createdAt": "2026-02-28T01:01:13.412Z",
+  "id": "-v93vTkbPuJcREmclRnSE",
+  "name": "IA Assistente Financeiro",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=👤 Perfil\nVocê é o Assistente Financeiro da Empresa Hash, especialista em gestão de despesas via Supabase. Sua missão é garantir que os registros financeiros sejam precisos, organizados e manipulados com total segurança e integridade.\n\n🛠️ Diretrizes de Operação\nIdentificação de Intenção: Identifique se o usuário deseja: Adicionar, Consultar, Atualizar, Remover ou Somar/Calcular.\n\nFerramentas: Use SEMPRE as ferramentas disponíveis para interagir com o banco de dados. Nunca simule respostas.\n\nPadrão de Datas: - Receba do usuário em DD/MM/AAAA.\n\nConverta para YYYY-MM-DD ao enviar para o banco.\n\nConverta de volta para DD/MM/AAAA ao exibir resultados.\n\nTom de Voz: Profissional, direto e focado em precisão. Use tabelas Markdown para exibir dados.\n\n📝 Fluxos de Trabalho\n1. Adicionar Despesas (adicionar_despesas)\nColeta Obrigatória: Ordem de Compra (OC), Data, Categoria, Fornecedor, Método de Pagamento e Valor.\n\nValidação de Categorias: Operacional, Alimentacao, Tecnologia, Transporte, Marketing.\n\nProtocolo: Apresente um resumo dos dados e peça \"OK\" do usuário antes de salvar.\n\n2. Consultar Despesas (consultar_despesas)\nTratamento de Períodos: Converta termos relativos (ex: \"mês passado\") em datas de início e fim no formato YYYY-MM-DD.\n\nExibição: Utilize Tabelas Markdown. Sempre exiba o Somatório Total dos valores encontrados ao final da consulta.\n\n3. Atualizar Despesas (atualizar_despesas)\nValidação Prévia: Utilize consultar_despesas para confirmar a existência da Ordem de Compra.\n\nProcesso: Mostre os dados atuais, solicite a alteração, apresente o comparativo \"De/Para\" e peça confirmação antes de executar.\n\n4. Remover Despesas (remover_despesas)\nProtocolo de Segurança: 1. Localize a despesa com consultar_despesas. 2. Exiba os detalhes e peça confirmação explícita. 3. Execute a remoção apenas após o \"Sim\" do usuário.\n\n5. Somar Despesas (somar_despesas)\nUso: Utilize esta ferramenta quando o usuário solicitar o total acumulado de um Fornecedor específico ou de uma Categoria específica.\n\nRefinamento: Se o usuário não especificar um período, pergunte se ele deseja o total de todo o histórico ou de um mês específico.\n\nResposta: Informe o valor total formatado (R$) e mencione a quantidade de registros que compõem essa soma para maior clareza.\n\n⚠️ Segurança e Precisão\nZero Alucinação: Se a consulta retornar vazio, informe: \"Nenhum registro encontrado para os critérios informados.\"\n\nErros de Sistema: Se uma ferramenta retornar erro, reporte o problema de forma clara ao usuário.\n\nCálculos: Sempre valide se os filtros (fornecedor/categoria) foram identificados corretamente antes de chamar a ferramenta de soma."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        536,
+        0
+      ],
+      "id": "ee97c1d1-50e9-4083-a2d5-22fff3708f50",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        224
+      ],
+      "id": "35aee90b-cbfe-4ac9-8eae-c3cdff5d8039",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        224
+      ],
+      "id": "4e2585f0-baa5-4053-8fa7-da402a275d9f",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "tableId": "Despesas",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "ordem_de_compra",
+              "fieldValue": "={{ $fromAI(\"ordem_de_compra\") }}"
+            },
+            {
+              "fieldId": "data_despesa",
+              "fieldValue": "={{ $fromAI(\"data_despesa\") }}"
+            },
+            {
+              "fieldId": "categoria",
+              "fieldValue": "={{ $fromAI(\"categoria\") }}"
+            },
+            {
+              "fieldId": "fornecedor",
+              "fieldValue": "={{ $fromAI(\"fornecedor\")}}"
+            },
+            {
+              "fieldId": "metodo_pagamento",
+              "fieldValue": "={{ $fromAI(\"metodo_pagamento\") }}"
+            },
+            {
+              "fieldId": "valor",
+              "fieldValue": "={{ $fromAI(\"valor\") }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        480,
+        224
+      ],
+      "id": "e948d5c1-7fca-4cd5-93a8-7a677a92c69d",
+      "name": "adicionar_despesas",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "Despesas",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        608,
+        224
+      ],
+      "id": "349f8cba-d9e5-4aac-8dbc-6d67fde6c77a",
+      "name": "consultar_despesas",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "Despesas",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ordem_de_compra",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI(\"ordem_de_compra\") }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "ordem_de_compra",
+              "fieldValue": "={{ $fromAI(\"ordem_de_compra\") }}"
+            },
+            {
+              "fieldId": "data_despesa",
+              "fieldValue": "={{ $fromAI(\"data_despesa\") }}"
+            },
+            {
+              "fieldId": "categoria",
+              "fieldValue": "={{ $fromAI(\"categoria\") }}"
+            },
+            {
+              "fieldId": "fornecedor",
+              "fieldValue": "={{ $fromAI(\"fornecedor\") }}"
+            },
+            {
+              "fieldId": "metodo_pagamento",
+              "fieldValue": "={{ $fromAI(\"metodo_pagamento\") }}"
+            },
+            {
+              "fieldId": "valor",
+              "fieldValue": "={{ $fromAI(\"valor\") }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        736,
+        224
+      ],
+      "id": "069c72d2-73be-4319-bbde-9ad3f9757889",
+      "name": "atualizar_despesas",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "Despesas",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ordem_de_compra",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI(\"ordem_de_compra\") }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        864,
+        224
+      ],
+      "id": "becb40e1-1578-4ba8-ac28-e028652b47cc",
+      "name": "remover_despesas",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        992,
+        224
+      ],
+      "id": "7b075eaa-e164-4b97-af94-c855cb86d4b6",
+      "name": "somar_despesas"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ced0291f-5cc6-4a6c-96e5-746596346310",
+      "name": "Telegram Trigger",
+      "webhookId": "11e993d8-4216-43f0-8d5e-75cffbe44bed",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        0
+      ],
+      "id": "ce6e326d-cf6a-413d-8df8-67ea755d5946",
+      "name": "Send a text message",
+      "webhookId": "5ee372a0-75c1-4b5f-b6a9-362cef6e83fe",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "adicionar_despesas": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultar_despesas": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualizar_despesas": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "remover_despesas": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "somar_despesas": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d3458531-b915-4702-b376-95fdd24810e6",
+  "activeVersionId": "d3458531-b915-4702-b376-95fdd24810e6",
+  "versionCounter": 127,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-28T01:01:13.469Z",
+      "createdAt": "2026-02-28T01:01:13.469Z",
+      "role": "workflow:owner",
+      "workflowId": "-v93vTkbPuJcREmclRnSE",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": "Version d3458531",
+    "description": ""
+  }
+}

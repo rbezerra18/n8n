@@ -1,0 +1,193 @@
+{
+  "updatedAt": "2026-03-14T00:40:56.866Z",
+  "createdAt": "2026-03-13T03:14:21.104Z",
+  "id": "kAsdRZ1KjxbpaDXd",
+  "name": "Aulão n8n",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "050ace91-812f-40f5-86f8-863b093422a1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "36722382-1026-46f6-8182-cb43f5ee28e5",
+      "name": "Webhook",
+      "webhookId": "050ace91-812f-40f5-86f8-863b093422a1"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "chcxkB6JBFrET5UU",
+          "mode": "list",
+          "cachedResultName": "HashAulaon8n",
+          "cachedResultUrl": "/projects/VVxZAAu3tVJ8rPKl/datatables/chcxkB6JBFrET5UU"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nome": "={{ $json.body.name }}",
+            "Email": "={{ $json.body.email }}",
+            "Telefone": "={{ $json.body.phone }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Nome",
+              "displayName": "Nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Telefone",
+              "displayName": "Telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "854b6497-bd58-4823-b2ac-328a34304b76",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Inscrição confirmada para o Aulão de n8n da Hash",
+        "message": "=<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n<meta charset=\"UTF-8\">\n<title>Confirmação de inscrição</title>\n</head>\n\n<body style=\"margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;\">\n\n<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding:40px 0;\">\n<tr>\n<td align=\"center\">\n\n<table width=\"620\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.08);\">\n\n<!-- HEADER -->\n<tr>\n<td style=\"background:linear-gradient(135deg,#111827,#2563eb);padding:40px;text-align:center;color:#ffffff;\">\n<h1 style=\"margin:0;font-size:28px;\">Aulão de n8n da Hash 🚀</h1>\n<p style=\"margin:10px 0 0;font-size:16px;opacity:0.9;\">\nSua inscrição foi confirmada\n</p>\n</td>\n</tr>\n\n<!-- BODY -->\n<tr>\n<td style=\"padding:40px;color:#374151;line-height:1.6;font-size:16px;\">\n\n<p style=\"margin-top:0;\">\nOlá <strong>{{ $json.Nome }}</strong>,\n</p>\n\n<p>\nSua inscrição no <strong>Aulão de n8n da Hash</strong> foi realizada com sucesso!  \nEstamos animados em ter você conosco para aprender automações poderosas com n8n.\n</p>\n\n<!-- EVENT CARD -->\n<table width=\"100%\" style=\"margin:30px 0;background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb;\">\n<tr>\n<td style=\"padding:25px;text-align:center;\">\n\n<h2 style=\"margin-top:0;color:#111827;\">📅 Informações do Evento</h2>\n\n<p style=\"margin:8px 0;\">\n<strong>Data:</strong> 30 de março de 2026\n</p>\n\n<p style=\"margin:8px 0;\">\n<strong>Horário:</strong> 10h\n</p>\n\n<p style=\"margin:8px 0;\">\n<strong>Formato:</strong> Online\n</p>\n\n</td>\n</tr>\n</table>\n\n<p>\nNo dia do evento enviaremos o <strong>link de acesso da aula</strong> para este mesmo email.\n</p>\n\n<p>\nRecomendamos que você adicione o evento ao seu calendário para não esquecer.\n</p>\n\n<!-- BUTTON -->\n<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin:30px 0;\">\n<tr>\n<td align=\"center\">\n\n<a href=\"https://calendar.google.com/calendar/render?action=TEMPLATE&text=Aul%C3%A3o+de+n8n+da+Hash&dates=20260330T130000Z/20260330T150000Z&details=Aul%C3%A3o+gratuito+de+n8n+da+Hash.+O+link+da+aula+ser%C3%A1+enviado+no+dia+do+evento.&location=Online\"\nstyle=\"background:#2563eb;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:6px;font-weight:bold;font-size:15px;display:inline-block;\">\nAdicionar ao Google Calendar\n</a>\n\n</td>\n</tr>\n</table>\n\n<p>\nNos vemos no aulão! 💻\n</p>\n\n<p style=\"margin-top:30px;\">\n<strong>Equipe Hash</strong>\n</p>\n\n</td>\n</tr>\n\n<!-- FOOTER -->\n<tr>\n<td style=\"background:#f9fafb;padding:25px;text-align:center;font-size:13px;color:#6b7280;border-top:1px solid #e5e7eb;\">\n\n<p style=\"margin:0;\">\nVocê está recebendo este email porque se inscreveu no evento\n<strong>Aulão de n8n da Hash</strong>.\n</p>\n\n</td>\n</tr>\n\n</table>\n\n</td>\n</tr>\n</table>\n\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "4984e5ec-b4e5-4d75-9cc8-074e2ec49d6b",
+      "name": "Send a message",
+      "webhookId": "4b513a53-082c-4075-9f99-cf8ba0d8ec63",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Inscrição no Aulão de n8n",
+        "height": 256,
+        "width": 784,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -88,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "47c05ebe-d5c2-4c30-b805-c73ebb0e4d85",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1dd18609-1a7e-47c2-83f4-401ae0a16736",
+  "activeVersionId": null,
+  "versionCounter": 34,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-03-13T03:14:21.107Z",
+      "createdAt": "2026-03-13T03:14:21.107Z",
+      "role": "workflow:owner",
+      "workflowId": "kAsdRZ1KjxbpaDXd",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

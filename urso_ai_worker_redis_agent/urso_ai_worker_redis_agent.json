@@ -1,0 +1,320 @@
+{
+  "updatedAt": "2026-02-19T21:20:06.000Z",
+  "createdAt": "2026-02-19T21:05:36.378Z",
+  "id": "RNLNUD3zbqxzG8z5PqgIt",
+  "name": "URSO - AI Worker (Redis -> Agent)",
+  "description": null,
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "seconds"
+            }
+          ]
+        }
+      },
+      "id": "05d66289-a721-4249-a309-d38e0afb9bde",
+      "name": "Worker Tick",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "keys"
+      },
+      "id": "6863195f-e6db-4edc-b713-a4bf7441323c",
+      "name": "Find Buffers",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        -16
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "range"
+      },
+      "id": "12f2fb43-86a4-4f03-8ef6-3edc0518ceaf",
+      "name": "Read Messages",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        112,
+        -16
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const msgs = $json.data.reverse();\nreturn [{ prompt: msgs.join('\\n') }];"
+      },
+      "id": "2072c0c2-65b8-4dd1-abda-5f955471c4f3",
+      "name": "Build AI Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "5525a8b9-0196-43b1-896e-2c344deaac6f",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [
+        496,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{$json.key}}"
+      },
+      "id": "c69b2cb1-e727-484a-8362-a3be23424e35",
+      "name": "Clear Buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        768,
+        -16
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "id": "96b206e9-4005-4f8a-a0c3-f242c9f9881a",
+      "name": "Slack Trigger",
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        -224
+      ],
+      "webhookId": "dcb39582-4a77-41db-bf18-36ccbc5c74b3",
+      "credentials": {
+        "slackApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const channel = $json.event.channel;\nconst user = $json.event.user;\nconst thread = $json.event.thread_ts || $json.event.ts;\n\nreturn [{\n  redisKey: `chatbuffer:${channel}:${thread}:${user}`,\n  text: $json.event.text,\n  channel,\n  thread\n}];"
+      },
+      "id": "cbda2c27-3dee-46b4-bc54-a2a4d512c21e",
+      "name": "Build Redis Key",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        -224
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "push"
+      },
+      "id": "411c1702-ea56-478f-b703-b305854e3b80",
+      "name": "Redis LPUSH",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        112,
+        -224
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "expire"
+      },
+      "id": "0574d225-7e37-40dd-bafc-ffd8ddb0cf51",
+      "name": "Reset TTL (Debounce)",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        336,
+        -224
+      ],
+      "credentials": {
+        "redis": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Worker Tick": {
+      "main": [
+        [
+          {
+            "node": "Find Buffers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Buffers": {
+      "main": [
+        [
+          {
+            "node": "Read Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Messages": {
+      "main": [
+        [
+          {
+            "node": "Build AI Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build AI Prompt": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Clear Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Redis Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Redis Key": {
+      "main": [
+        [
+          {
+            "node": "Redis LPUSH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis LPUSH": {
+      "main": [
+        [
+          {
+            "node": "Reset TTL (Debounce)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "50c6bfb5-5825-4ac2-a145-d0c791295c76",
+  "activeVersionId": null,
+  "versionCounter": 8,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-19T21:05:36.406Z",
+      "createdAt": "2026-02-19T21:05:36.406Z",
+      "role": "workflow:owner",
+      "workflowId": "RNLNUD3zbqxzG8z5PqgIt",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

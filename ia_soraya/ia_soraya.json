@@ -1,0 +1,614 @@
+{
+  "updatedAt": "2026-02-23T02:09:15.113Z",
+  "createdAt": "2026-02-23T00:36:41.117Z",
+  "id": "ZmeE4WBGCXYI0kpjD8byJ",
+  "name": "IA Soraya",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {
+          "download": true,
+          "userIds": "379927823"
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        -128
+      ],
+      "id": "ecf3734b-d720-4788-a1f9-42e67fd5a0d8",
+      "name": "Telegram Trigger",
+      "webhookId": "8ec44472-1e2a-4671-b185-a285d713c52b",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=Você é um assistente conversacional chamada Soraya, do sexo feminino, solteira e jovem, que possui uma personalidade sexy e irônica, é aliada da comunidade LGBTQIAPN+ e melhor amiga do Roberto.\n\nTipo de entrada recebida: {{$json.meta.input_type}}\n\nRegras de comportamento:\n\n- Se for \"voice\":\n  Responda de forma mais natural e conversacional, como fala humana.\n\n- Se for \"image\":\n  Primeiro descreva brevemente o que entendeu da imagem e depois ajude o usuário.\n\n- Se for \"text\":\n  Responda normalmente.\n\n- Se for \"multimodal\":\n  Combine todas as informações antes de responder.\n\nNunca mencione metadados ou estrutura interna."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1344,
+        -128
+      ],
+      "id": "6808d932-ac00-4897-9050-b1b077e68f08",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1360,
+        112
+      ],
+      "id": "01c59c48-86fd-4ec7-aeae-605f17f7aa5e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1488,
+        112
+      ],
+      "id": "3813bda7-930d-4ed7-ac17-b8fcb2f2ce42",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        896,
+        -384
+      ],
+      "id": "38ba1412-fe6c-47e8-bafb-62a66109ab33",
+      "name": "Audio",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "O que é essa imagem?",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        896,
+        -192
+      ],
+      "id": "f5538c23-ef10-4084-9f67-f9c8ede7dd07",
+      "name": "Image",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        -384
+      ],
+      "id": "36424f28-3c38-4dd2-89a1-bc945634d984",
+      "name": "Download Audio",
+      "webhookId": "3c394790-8183-4e52-b4ee-66c3a4fc408c",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{$json.file_id}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        -192
+      ],
+      "id": "bab7333c-983b-4e3c-b095-2b0de90b244a",
+      "name": "Download Image",
+      "webhookId": "5ae8413c-b157-424e-8c10-875636594fb2",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $(\"Telegram Trigger\").first().json.message;\n\nlet route = \"unknown\";\nlet file_id = null;\nlet text = \"\";\n\n// TEXTO\nif (msg.text) {\n  route = \"text\";\n  text = msg.text;\n}\n\n// FOTO\nif (msg.photo) {\n  route = \"image\";\n  file_id = msg.photo[msg.photo.length - 1].file_id;\n  text = msg.caption || \"\";\n}\n\n// ÁUDIO (voice message)\nif (msg.voice) {\n  route = \"voice\";\n  file_id = msg.voice.file_id;\n}\n\n// DOCUMENTO\nif (msg.document) {\n  route = \"document\";\n  file_id = msg.document.file_id;\n  text = msg.caption || \"\";\n}\n\n// MULTIMODAL (foto + texto)\nif (msg.photo && msg.caption) {\n  route = \"multimodal\";\n}\n\nreturn [\n  {\n    json: {\n      route,\n      file_id,\n      text,\n      chat_id: msg.chat.id,\n      user_id: msg.from.id\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -128
+      ],
+      "id": "c42d089c-59e4-4bd0-8edb-0355aa65260a",
+      "name": "Smart Router"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "voice",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "81fe5228-2865-4455-b146-9168a810d27b"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "32f896c0-f754-455f-badc-8bcaa91568f9",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "eed890f1-913b-4119-82c5-bec3c0b896de",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "multimodal",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "662a65a2-5abd-40f9-9a05-f94da57d7a1b",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "document",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7246c885-19ba-4404-b759-ae2641254978",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        -176
+      ],
+      "id": "41e76453-1f88-4816-ace4-db02b5bee291",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Smart Router').item.json.chat_id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1696,
+        -128
+      ],
+      "id": "5ace186d-4dfd-44e1-b990-979dc04d58b2",
+      "name": "Send a text message",
+      "webhookId": "9657ec83-f33e-4138-b7b2-3e67c8f0374e",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let finalText = $json.text || \"\";\n\n// áudio\ntry {\n  const audio = $(\"Audio\").first().json.text;\n  if (audio) finalText += \"\\n\\nÁudio: \" + audio;\n} catch {}\n\n// imagem\ntry {\n  const img = $(\"Image\").first().json.text;\n  if (img) finalText += \"\\n\\nImagem: \" + img;\n} catch {}\n\n// PDF\ntry {\n  const pdf = $(\"Extract From File\").first().json.text;\n  if (pdf) finalText += \"\\n\\nConteúdo do documento:\\n\" + pdf;\n} catch {}\n\nreturn [\n  {\n    json: {\n      text: finalText\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        -128
+      ],
+      "id": "dd8ec81d-796e-4131-b3fa-30ff239759c0",
+      "name": "Padronizar"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        96
+      ],
+      "id": "c689fd39-d33b-409b-9b24-1ff4ef5151d2",
+      "name": "PDF"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{$json.file_id}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        96
+      ],
+      "id": "18472866-349a-45a9-be51-527196d8af84",
+      "name": "Download PDF",
+      "webhookId": "882e26a5-ddab-4b5a-a03a-b0e75f7739d1",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Smart Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio": {
+      "main": [
+        [
+          {
+            "node": "Padronizar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image": {
+      "main": [
+        [
+          {
+            "node": "Padronizar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Audio": {
+      "main": [
+        [
+          {
+            "node": "Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image": {
+      "main": [
+        [
+          {
+            "node": "Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Smart Router": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Download Audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Padronizar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Padronizar": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF": {
+      "main": [
+        [
+          {
+            "node": "Padronizar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download PDF": {
+      "main": [
+        [
+          {
+            "node": "PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "9b30b93d-1a64-47cf-8445-e7d66699976f",
+  "activeVersionId": null,
+  "versionCounter": 208,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-23T00:36:41.355Z",
+      "createdAt": "2026-02-23T00:36:41.355Z",
+      "role": "workflow:owner",
+      "workflowId": "ZmeE4WBGCXYI0kpjD8byJ",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": "Version 9b30b93d",
+    "description": ""
+  }
+}

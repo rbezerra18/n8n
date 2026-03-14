@@ -1,0 +1,239 @@
+{
+  "updatedAt": "2026-02-24T03:03:22.116Z",
+  "createdAt": "2026-02-24T02:25:49.942Z",
+  "id": "LKZKGl3J_AhgkfrxCMbhg",
+  "name": "multi-agente Comercial",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "text"
+            },
+            {
+              "name": "threadID"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "aca26519-e5e6-43a9-9bb2-f34b10f88ed5",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        224
+      ],
+      "id": "8ed30d20-6562-4991-8d99-43ae9f3d2468",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_ID",
+          "name": "REDACTED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.threadID }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        224
+      ],
+      "id": "69d6c358-d09d-4213-940b-441a9fb75a1b",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=Você é consultor comercial da Hash Computadores.\n\nPROCESSO OBRIGATÓRIO:\n\n1. Sempre use a ferramenta classify_intent para entender o estágio do cliente.\n2. Se intent = explorando:\n   - faça perguntas\n   - entenda necessidades\n   - não ofereça produto ainda\n\n3. Se intent = compra:\n   - consulte get_hash_catalogo\n   - recomende o modelo ideal\n   - explique pagamento e próximos passos\n\n4. Se intent = suporte_tecnico:\n   - não venda\n   - oriente procurar suporte técnico\n\nREGRAS:\n- Tom amigável e consultivo.\n- Nunca inventar especificações.\n- Não oferecer descontos.\n\nGERENCIAMENTO DE ESTÁGIO DO CLIENTE\n\n1. Sempre verifique se existe \"lead_stage\" na memória.\n2. Se existir, ele tem prioridade sobre nova análise.\n3. Só atualize o estágio se houver avanço claro.\n\nFluxo:\n\nexplorando → compra → (fim)\nexplorando → suporte_tecnico\n\nNunca retroceda estágio.\n\nQuando detectar avanço:\n- use update_lead_stage."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        408,
+        0
+      ],
+      "id": "c4d04cc3-9146-40d1-9796-7196a2a19327",
+      "name": "AI Comercial"
+    },
+    {
+      "parameters": {
+        "description": "=Use esta ferramenta quando precisar consultar modelos,\nespecificações, preços ou indicar um computador da Hash.",
+        "jsCode": "return `\nMODELOS HASH DISPONÍVEIS\n\nHash Office 200X\n- Ideal: Escritório e estudos\n- CPU: Intel i3-12100\n- RAM: 8GB DDR4\n- SSD: 256GB\n- Sistema: Windows 11 Home\n- Preço: R$ 3500\n\nHash ProBook Z5\n- Ideal: Profissionais e multitarefa\n- CPU: Ryzen 5 5600U\n- RAM: 16GB DDR4\n- SSD: 512GB\n- Sistema: Windows 11 Pro\n- Preço: R$ 4500\n\nHash Gamer Neo R7\n- Ideal: Games e uso pesado\n- CPU: Intel i7-13700KF\n- RAM: 32GB DDR5\n- SSD NVMe 1TB\n- GPU: RTX 4070 12GB\n- Sistema: Windows 11 Pro\n- Preço: R$ 8500\n`;"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        224
+      ],
+      "id": "2fce8743-51ad-4ac2-a56e-5276b195cb21",
+      "name": "get_hash_catalogo"
+    },
+    {
+      "parameters": {
+        "description": "Classifica o estágio do cliente:\nexplorando, compra ou suporte_tecnico.\nUse antes de recomendar produtos.",
+        "jsCode": "const msg = $input.first().json.message.toLowerCase();\n\nlet intent = \"explorando\";\n\nif (\n  msg.includes(\"preço\") ||\n  msg.includes(\"valor\") ||\n  msg.includes(\"comprar\") ||\n  msg.includes(\"pagamento\") ||\n  msg.includes(\"parcelar\")\n) {\n  intent = \"compra\";\n}\n\nif (\n  msg.includes(\"erro\") ||\n  msg.includes(\"não liga\") ||\n  msg.includes(\"problema\") ||\n  msg.includes(\"defeito\") ||\n  msg.includes(\"suporte\")\n) {\n  intent = \"suporte_tecnico\";\n}\n\nreturn { intent };"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        224
+      ],
+      "id": "7b43e3f5-7182-42ce-8b78-95e90b9d285a",
+      "name": "classify_intent"
+    },
+    {
+      "parameters": {
+        "description": "Salva ou atualiza o estágio do cliente.\nUse quando identificar mudança clara de intenção.",
+        "jsCode": "const stage = $input.first().json.stage;\n\nreturn {\n  lead_stage: stage,\n  updated: true\n};"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        736,
+        224
+      ],
+      "id": "e26a02be-3eba-4120-b78f-78b8e2e6ba42",
+      "name": "update_lead_stage"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Comercial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Comercial",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Comercial",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_hash_catalogo": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Comercial",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classify_intent": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Comercial",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_lead_stage": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Comercial",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1bde7448-4f64-4fd1-b852-8f9d084e403e",
+  "activeVersionId": null,
+  "versionCounter": 52,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-24T02:25:49.979Z",
+      "createdAt": "2026-02-24T02:25:49.979Z",
+      "role": "workflow:owner",
+      "workflowId": "LKZKGl3J_AhgkfrxCMbhg",
+      "projectId": "VVxZAAu3tVJ8rPKl",
+      "project": {
+        "updatedAt": "2026-02-10T23:28:34.397Z",
+        "createdAt": "2026-02-10T23:26:00.505Z",
+        "id": "VVxZAAu3tVJ8rPKl",
+        "name": "Roberto Bezerra <rbezerra18@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "b1c51dbf-a371-4a6f-8d1d-24f1c185b11e"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}
